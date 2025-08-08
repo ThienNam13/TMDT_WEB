@@ -4,15 +4,15 @@ require_once("../../php/db.php");
 $keyword = $_GET['q'] ?? '';
 $keyword = "%" . $keyword . "%";
 
-$stmt = $link->prepare("SELECT * FROM foods WHERE is_available = 1 AND (ten_mon LIKE ? OR mo_ta LIKE ?)");
+$stmt = $link->prepare("SELECT * FROM san_pham WHERE is_available = 1 AND (ten_sp LIKE ? OR mo_ta LIKE ?)");
 $stmt->bind_param("ss", $keyword, $keyword);
 $stmt->execute();
 $result = $stmt->get_result();
 
-$foods = [];
+$products = [];
 while ($row = $result->fetch_assoc()) {
-  $foods[] = $row;
+  $products[] = $row;
 }
 
-echo json_encode($foods);
+echo json_encode($products);
 ?>

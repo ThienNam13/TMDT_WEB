@@ -33,11 +33,11 @@ if (!$order || $order['user_id'] != $_SESSION['user_id']) {
     exit;
 }
 
-// Truy vấn các món ăn trong đơn hàng
+// Truy vấn các sản phẩm trong đơn hàng
 $stmt2 = $link->prepare("
-  SELECT f.ten_mon, oi.so_luong, oi.don_gia 
+  SELECT p.ten_sp, oi.so_luong, oi.don_gia 
   FROM order_items oi
-  JOIN foods f ON oi.food_id = f.id
+  JOIN products p ON oi.product_id = p.id
   WHERE oi.order_id = (
     SELECT id FROM orders WHERE ma_don = ?
   )
@@ -95,7 +95,7 @@ $stmt2->close();
         <table>
           <thead>
             <tr>
-              <th>Món ăn</th>
+              <th>Mỹ phẩm</th>
               <th>Số lượng</th>
               <th>Đơn giá</th>
               <th>Thành tiền</th>
@@ -109,7 +109,7 @@ $stmt2->close();
               $tong += $thanh_tien;
             ?>
             <tr>
-              <td><?= htmlspecialchars($item['ten_mon']) ?></td>
+              <td><?= htmlspecialchars($item['ten_sp']) ?></td>
               <td><?= $item['so_luong'] ?></td>
               <td><?= number_format($item['don_gia'], 0, ',', '.') ?>₫</td>
               <td><?= number_format($thanh_tien, 0, ',', '.') ?>₫</td>

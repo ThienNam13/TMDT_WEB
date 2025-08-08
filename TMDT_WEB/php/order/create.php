@@ -69,17 +69,17 @@ $update_stmt->bind_param("si", $ma_don, $order_id);
 $update_stmt->execute();
 $update_stmt->close();
 
-// Thêm các món vào order_items
-$stmt_item = $link->prepare("INSERT INTO order_items (order_id, food_id, so_luong, don_gia) VALUES (?, ?, ?, ?)");
+// Thêm các sản phẩm vào order_items
+$stmt_item = $link->prepare("INSERT INTO order_items (order_id, san_pham_id, so_luong, don_gia) VALUES (?, ?, ?, ?)");
 
 foreach ($cart as $item) {
   if (!isset($item['id'], $item['so_luong'], $item['gia'])) {
     continue;
   }
-  $food_id = $item['id'];
+  $san_pham_id = $item['id'];
   $so_luong = $item['so_luong'];
   $don_gia = $item['gia'];
-  $stmt_item->bind_param("iiid", $order_id, $food_id, $so_luong, $don_gia);
+  $stmt_item->bind_param("iiid", $order_id, $san_pham_id, $so_luong, $don_gia);
   $stmt_item->execute();
 }
 echo "<pre>";

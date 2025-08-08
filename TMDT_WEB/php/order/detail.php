@@ -29,9 +29,9 @@ $order_id = $order['id'];
 
 // Truy vấn các món trong đơn hàng
 $sql_items = "
-    SELECT f.ten_mon AS name, oi.so_luong AS quantity, oi.don_gia AS price
+    SELECT f.ten_sp AS name, oi.so_luong AS quantity, oi.don_gia AS price
     FROM order_items oi
-    JOIN foods f ON oi.food_id = f.id
+    JOIN san_pham f ON oi.san_pham_id = f.id
     WHERE oi.order_id = ?
 ";
 $stmt_items = $link->prepare($sql_items);
@@ -48,7 +48,7 @@ header('Content-Type: application/json');
 echo json_encode([
     'order_id' => $ma_don,
     'tong_tien' => $order['tong_tien'],
-    "trang_thai": "Đang giao",
+    'trang_thai' => 'Đang giao',
     'items' => $items
 ]);
 
