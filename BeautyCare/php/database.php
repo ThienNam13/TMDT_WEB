@@ -1,12 +1,14 @@
 <?php
-$host = 'localhost';
-$dbname = 'myphamdb';
-$username = 'root';
-$password = '';
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "myphamdb";
 
-$link = @new mysqli($host, $username, $password, $dbname);
+// Kết nối
+$conn = new mysqli($servername, $username, $password, $dbname);
 
-if ($link->connect_error) {
-    die("Kết nối thất bại.");
+// Kiểm tra kết nối
+if ($conn->connect_error) {
+    die("Kết nối thất bại: " . $conn->connect_error);
 }
 ?>
