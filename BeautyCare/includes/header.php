@@ -1,3 +1,8 @@
+<?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+?>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -24,7 +29,18 @@
             </form>
             <div class="header-icons">
                 <a href="cart.php" class="icon-btn">🛒</a>
-                <a href="account.php" class="icon-btn">👤</a>
+                <?php if (isset($_SESSION['user_id'])): ?>
+                    <div class="user-dropdown">
+                        <button class="icon-btn">👤</button>
+                        <div class="user-dropdown-content">
+                            <a href="account.php">Thông tin tài khoản</a>
+                            <a href="order-history.php">Lịch sử đơn hàng</a>
+                            <a href="php/logout.php">Đăng xuất</a>
+                        </div>
+                    </div>
+                <?php else: ?>
+                    <a href="login.php" class="icon-btn">🔑</a>
+                 <?php endif; ?>
             </div>
         </div>
     </header>

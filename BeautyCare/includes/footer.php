@@ -1,5 +1,4 @@
 
-<link rel="stylesheet" href=" assets/css/style.css" />
 <footer class="site-footer">
     <div class="footer-container">
         <div class="footer-about">
