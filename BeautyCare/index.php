@@ -4,6 +4,12 @@ include 'php/database.php'; // Kết nối CSDL
 <?php include 'includes/header.php'; ?>
 <?php include 'includes/navbar.php'; ?>
 
+<?php if (isset($_SESSION['success'])): ?>
+    <div class="alert success">
+        <?php echo $_SESSION['success']; unset($_SESSION['success']); ?>
+    </div>
+<?php endif; ?>
+
 <!-- Slider Banner -->
 <div class="banner-slider swiper">
     <div class="swiper-wrapper">
@@ -85,4 +91,12 @@ var swiper = new Swiper('.swiper', {
     navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' },
     autoplay: { delay: 3000 }
 });
+setTimeout(() => {
+    const alerts = document.querySelectorAll('.alert');
+    alerts.forEach(alert => {
+        alert.style.opacity = '0';
+        alert.style.transition = 'opacity 0.5s ease';
+        setTimeout(() => alert.remove(), 500); // Xóa khỏi DOM sau khi mờ dần
+    });
+}, 3000); // 3 giây
 </script>

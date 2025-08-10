@@ -44,3 +44,16 @@ if (session_status() === PHP_SESSION_NONE) {
             </div>
         </div>
     </header>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const logoutLinks = document.querySelectorAll('.user-dropdown-content a[href="php/logout.php"]');
+    logoutLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            if (confirm("Bạn có chắc muốn đăng xuất?")) {
+                window.location.href = this.href;
+            }
+        });
+    });
+});
+</script>
