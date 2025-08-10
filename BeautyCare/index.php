@@ -30,7 +30,7 @@ include 'php/database.php'; // Kết nối CSDL
             </div>
         </div>
         <div class="swiper-slide">
-            <img src="assets/img/banner3.jpg" alt="Mỹ phẩm cao cấp">
+            <img src="assets/img/banner3.png" alt="Mỹ phẩm cao cấp">
             <div class="banner-text">
                 <h2>Mỹ phẩm cao cấp</h2>
                 <p>Miễn phí ship toàn quốc</p>

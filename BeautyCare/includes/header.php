@@ -14,6 +14,7 @@ if (session_status() === PHP_SESSION_NONE) {
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <!-- Font Poppins -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
     <header class="site-header">
@@ -35,7 +36,7 @@ if (session_status() === PHP_SESSION_NONE) {
                         <div class="user-dropdown-content">
                             <a href="account.php">Thông tin tài khoản</a>
                             <a href="order-history.php">Lịch sử đơn hàng</a>
-                            <a href="php/logout.php">Đăng xuất</a>
+                            <a href="#" id="logoutBtn">Đăng xuất</a>
                         </div>
                     </div>
                 <?php else: ?>
@@ -46,14 +47,40 @@ if (session_status() === PHP_SESSION_NONE) {
     </header>
 <script>
 document.addEventListener("DOMContentLoaded", () => {
-    const logoutLinks = document.querySelectorAll('.user-dropdown-content a[href="php/logout.php"]');
-    logoutLinks.forEach(link => {
-        link.addEventListener('click', function(e) {
+    const logoutBtn = document.getElementById("logoutBtn");
+    if (logoutBtn) {
+        logoutBtn.addEventListener("click", function(e) {
             e.preventDefault();
-            if (confirm("Bạn có chắc muốn đăng xuất?")) {
-                window.location.href = this.href;
-            }
+            Swal.fire({
+                title: 'Bạn có chắc muốn đăng xuất?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#b5838d',
+                cancelButtonColor: '#ccc',
+                confirmButtonText: 'Đăng xuất',
+                cancelButtonText: 'Hủy'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch('php/logout.php', { method: 'POST' })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.status === 'success') {
+                                Swal.fire({
+                                    title: data.message,
+                                    icon: 'success',
+                                    timer: 1500,
+                                    showConfirmButton: false
+                                });
+                                // Đổi icon 👤 thành 🔑 ngay tại chỗ
+                                const userDropdown = document.querySelector('.user-dropdown');
+                                if (userDropdown) {
+                                    userDropdown.outerHTML = `<a href="login.php" class="icon-btn">🔑</a>`;
+                                }
+                            }
+                        });
+                }
+            });
         });
-    });
+    }
 });
 </script>

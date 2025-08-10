@@ -101,6 +101,15 @@ body {
 /* HEADER */
 .icon-btn {
     cursor: pointer;
+    padding: 8px 12px;
+    border-radius: 10px;
+    display: inline-block;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.icon-btn:hover {
+    background-color: #fff;
+    color: #b5838d;
 }
 
 .site-header {
@@ -136,7 +145,7 @@ body {
     border-radius: 0 25px 25px 0;
     cursor: pointer;
 }
-.header-icons .icon-btn {
+.header-icons {
     margin-left: 15px;
     font-size: 20px;
     text-decoration: none;

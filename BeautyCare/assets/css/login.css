@@ -126,6 +126,7 @@ form button:hover {
     height: 100%;
     width: 50%;
     transition: transform 0.6s ease-in-out;
+    z-index: 101;
 }
 
 .overlay-left {
@@ -144,4 +145,12 @@ form button:hover {
     border-radius: 20px;
     padding: 10px 20px;
     cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+    position: relative;
+    z-index: 101;
+}
+
+.ghost:hover {
+    background-color: #fff;
+    color: #b5838d; /* hoặc màu tím pastel bạn thích */
 }

@@ -39,7 +39,8 @@
             <h1>Đăng nhập</h1>
             <input type="email" name="email" placeholder="Email" required>
             <input type="password" name="password" placeholder="Mật khẩu" required>
-            <button type="submit">Đăng nhập</button>
+            <button type="submit">Đăng nhập</button> <br>
+            <a href="forgot_password.php" style="font-size: 13px;">Quên mật khẩu?</a>
         </form>
     </div>
 
