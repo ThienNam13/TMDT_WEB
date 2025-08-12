@@ -21,7 +21,7 @@ if (session_status() === PHP_SESSION_NONE) {
         <div class="header-container">
             <div class="logo">
                 <a href="index.php">
-                    <img src="assets/img/logo.jpg" alt="BeautyCare Logo">
+                    <img src="assets/img/logo.png" alt="BeautyCare Logo">
                 </a>
             </div>
             <form class="search-bar" action="products.php" method="get">
