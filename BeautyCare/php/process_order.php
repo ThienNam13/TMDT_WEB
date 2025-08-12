@@ -1,0 +1,171 @@
+<?php
+include 'database.php';
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+header('Content-Type: application/json');
+
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    http_response_code(405);
+    echo json_encode(['status' => 'error', 'message' => 'Method not allowed']);
+    exit;
+}
+
+if (!isset($_SESSION['user_id'])) {
+    http_response_code(401);
+    echo json_encode(['status' => 'error', 'message' => 'Vui lòng đăng nhập để đặt hàng']);
+    exit;
+}
+
+function generateOrderCode(mysqli $conn): string {
+    // Ensure uniqueness with a couple of attempts
+    for ($i = 0; $i < 5; $i++) {
+        $code = 'BC' . date('ymdHis') . strtoupper(substr(bin2hex(random_bytes(3)), 0, 6));
+        $stmt = $conn->prepare('SELECT 1 FROM orders WHERE ma_don = ? LIMIT 1');
+        $stmt->bind_param('s', $code);
+        $stmt->execute();
+        $stmt->store_result();
+        $exists = $stmt->num_rows > 0;
+        $stmt->close();
+        if (!$exists) return $code;
+        usleep(100000); // 100ms
+    }
+    return 'BC' . date('ymdHis') . rand(10000, 99999);
+}
+
+// Collect and validate input
+$userId = (int) $_SESSION['user_id'];
+$hoTen  = trim($_POST['ho_ten'] ?? '');
+$sdt    = trim($_POST['sdt'] ?? '');
+$diaChi = trim($_POST['dia_chi'] ?? '');
+$phuongXa = trim($_POST['phuong_xa'] ?? '');
+$khuVuc = trim($_POST['khu_vuc'] ?? '');
+$ghiChu = trim($_POST['ghi_chu'] ?? '');
+$hinhThucThanhToan = trim($_POST['hinh_thuc_thanh_toan'] ?? 'COD');
+
+$items = [];
+if (!empty($_POST['items'])) {
+    $decoded = json_decode($_POST['items'], true);
+    if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+        foreach ($decoded as $it) {
+            $pid = isset($it['id']) ? (int)$it['id'] : 0;
+            $qty = isset($it['quantity']) ? (int)$it['quantity'] : 0;
+            if ($pid > 0 && $qty > 0) {
+                $items[] = ['id' => $pid, 'quantity' => $qty];
+            }
+        }
+    }
+}
+
+// Fallback: optional session cart support if not provided via POST
+if (empty($items) && isset($_SESSION['cart']) && is_array($_SESSION['cart'])) {
+    foreach ($_SESSION['cart'] as $pid => $qty) {
+        $pid = (int)$pid; $qty = (int)$qty;
+        if ($pid > 0 && $qty > 0) {
+            $items[] = ['id' => $pid, 'quantity' => $qty];
+        }
+    }
+}
+
+if ($hoTen === '' || $sdt === '' || $diaChi === '' || $khuVuc === '') {
+    echo json_encode(['status' => 'error', 'message' => 'Thiếu thông tin người nhận']);
+    exit;
+}
+
+if (empty($items)) {
+    echo json_encode(['status' => 'error', 'message' => 'Giỏ hàng trống']);
+    exit;
+}
+
+// Load product prices and validate availability
+$total = 0.0;
+$detailedItems = [];
+
+foreach ($items as $it) {
+    $pid = $it['id'];
+    $qty = $it['quantity'];
+    $stmt = $conn->prepare('SELECT id, ten_san_pham, gia, hinh_anh, is_available FROM san_pham WHERE id = ?');
+    $stmt->bind_param('i', $pid);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $prod = $result ? $result->fetch_assoc() : null;
+    $stmt->close();
+    if (!$prod || (int)$prod['is_available'] !== 1) {
+        echo json_encode(['status' => 'error', 'message' => 'Sản phẩm không khả dụng (ID: ' . $pid . ')']);
+        exit;
+    }
+    $price = (float)$prod['gia'];
+    $lineTotal = $price * $qty;
+    $total += $lineTotal;
+    $detailedItems[] = [
+        'san_pham_id' => (int)$prod['id'],
+        'so_luong' => $qty,
+        'don_gia' => $price,
+    ];
+}
+
+try {
+    $conn->begin_transaction();
+
+    $orderCode = generateOrderCode($conn);
+
+    $stmt = $conn->prepare('INSERT INTO orders (ma_don, user_id, ho_ten, sdt, dia_chi, phuong_xa, khu_vuc, tong_tien, ghi_chu, hinh_thuc_thanh_toan) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
+    $stmt->bind_param(
+        'sisssssdds',
+        $orderCode,
+        $userId,
+        $hoTen,
+        $sdt,
+        $diaChi,
+        $phuongXa,
+        $khuVuc,
+        $total,
+        $ghiChu,
+        $hinhThucThanhToan
+    );
+    $stmt->execute();
+    $orderId = $stmt->insert_id;
+    $stmt->close();
+
+    // Insert items
+    $stmt = $conn->prepare('INSERT INTO order_items (order_id, san_pham_id, so_luong, don_gia) VALUES (?, ?, ?, ?)');
+    foreach ($detailedItems as $di) {
+        $pid = $di['san_pham_id'];
+        $qty = $di['so_luong'];
+        $price = $di['don_gia'];
+        $stmt->bind_param('iiid', $orderId, $pid, $qty, $price);
+        $stmt->execute();
+    }
+    $stmt->close();
+
+    // Optional: create payment record
+    $stmt = $conn->prepare('INSERT INTO thanh_toan (order_id, phuong_thuc, trang_thai) VALUES (?, ?, ?)');
+    $trang_thai_tt = 'Chờ thanh toán';
+    $stmt->bind_param('iss', $orderId, $hinhThucThanhToan, $trang_thai_tt);
+    $stmt->execute();
+    $stmt->close();
+
+    $conn->commit();
+
+    // Clear session cart if used
+    if (!empty($_SESSION['cart'])) {
+        unset($_SESSION['cart']);
+    }
+
+    echo json_encode([
+        'status' => 'success',
+        'message' => 'Đặt hàng thành công',
+        'order_id' => $orderId,
+        'ma_don' => $orderCode,
+        'redirect' => 'order-success.php?order_id=' . $orderId
+    ]);
+    exit;
+} catch (Throwable $e) {
+    $conn->rollback();
+    http_response_code(500);
+    echo json_encode(['status' => 'error', 'message' => 'Lỗi xử lý đơn hàng', 'detail' => $e->getMessage()]);
+    exit;
+}
+
+
