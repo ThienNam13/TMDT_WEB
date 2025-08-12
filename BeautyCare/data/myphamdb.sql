@@ -18,13 +18,13 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `myphamdb`
+-- Cơ sở dữ liệu: `myphamdb`
 --
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `danh_gia`
+-- Cấu trúc bảng cho bảng `danh_gia`
 --
 
 CREATE TABLE `danh_gia` (
@@ -60,7 +60,7 @@ INSERT INTO `danh_muc` (`ma_danh_muc`, `ten_danh_muc`) VALUES
 -- --------------------------------------------------------
 
 --
--- Table structure for table `kho_hang`
+-- Cấu trúc bảng cho bảng `kho_hang`
 --
 
 CREATE TABLE `kho_hang` (
@@ -73,7 +73,7 @@ CREATE TABLE `kho_hang` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `orders`
+-- Cấu trúc bảng cho bảng `orders`
 --
 
 CREATE TABLE `orders` (
@@ -95,7 +95,7 @@ CREATE TABLE `orders` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `order_items`
+-- Cấu trúc bảng cho bảng `order_items`
 --
 
 CREATE TABLE `order_items` (
@@ -109,7 +109,7 @@ CREATE TABLE `order_items` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `san_pham`
+-- Cấu trúc bảng cho bảng `san_pham`
 --
 
 CREATE TABLE `san_pham` (
@@ -170,7 +170,7 @@ INSERT INTO `san_pham` (`id`, `ten_san_pham`, `thuong_hieu`, `phan_loai`, `mo_ta
 -- --------------------------------------------------------
 
 --
--- Table structure for table `thanh_toan`
+-- Cấu trúc bảng cho bảng `thanh_toan`
 --
 
 CREATE TABLE `thanh_toan` (
@@ -184,10 +184,18 @@ CREATE TABLE `thanh_toan` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `users`
+-- Cấu trúc bảng cho bảng `users`
 --
 
 CREATE TABLE `users` (
+  `id` int(11) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `phone` varchar(20) DEFAULT NULL,
+  `address` text DEFAULT NULL,
+  `password` varchar(255) NOT NULL,
+  `role` varchar(50) DEFAULT 'user',
+  `blocked` tinyint(1) NOT NULL DEFAULT 0,
+  `fullname` varchar(255) DEFAULT NULL
   `id` int NOT NULL,
   `email` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
   `password` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
@@ -197,11 +205,18 @@ CREATE TABLE `users` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Indexes for dumped tables
+-- Đang đổ dữ liệu cho bảng `users`
+--
+
+INSERT INTO `users` (`id`, `email`, `phone`, `address`, `password`, `role`, `blocked`, `fullname`) VALUES
+(1, 'nemakira001@gmail.com', '03881901703', '2 võ oanh', '$2y$10$A3/arVBhQi1DqCshmTwHMu2Nps7v.iVAt/8LHE2U9KaDUhNFvalxC', 'user', 0, 'Nguyễn Thiên Namm');
+
+--
+-- Chỉ mục cho các bảng đã đổ
 --
 
 --
--- Indexes for table `danh_gia`
+-- Chỉ mục cho bảng `danh_gia`
 --
 ALTER TABLE `danh_gia`
   ADD PRIMARY KEY (`id`),
@@ -222,7 +237,7 @@ ALTER TABLE `kho_hang`
   ADD KEY `san_pham_id` (`san_pham_id`);
 
 --
--- Indexes for table `orders`
+-- Chỉ mục cho bảng `orders`
 --
 ALTER TABLE `orders`
   ADD PRIMARY KEY (`id`),
@@ -230,7 +245,7 @@ ALTER TABLE `orders`
   ADD KEY `user_id` (`user_id`);
 
 --
--- Indexes for table `order_items`
+-- Chỉ mục cho bảng `order_items`
 --
 ALTER TABLE `order_items`
   ADD PRIMARY KEY (`id`),
@@ -238,32 +253,32 @@ ALTER TABLE `order_items`
   ADD KEY `san_pham_id` (`san_pham_id`);
 
 --
--- Indexes for table `san_pham`
+-- Chỉ mục cho bảng `san_pham`
 --
 ALTER TABLE `san_pham`
   ADD PRIMARY KEY (`id`),
   ADD KEY `fk_sanpham_danhmuc` (`ma_danh_muc`);
 
 --
--- Indexes for table `thanh_toan`
+-- Chỉ mục cho bảng `thanh_toan`
 --
 ALTER TABLE `thanh_toan`
   ADD PRIMARY KEY (`id`),
   ADD KEY `order_id` (`order_id`);
 
 --
--- Indexes for table `users`
+-- Chỉ mục cho bảng `users`
 --
 ALTER TABLE `users`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `email` (`email`);
 
 --
--- AUTO_INCREMENT for dumped tables
+-- AUTO_INCREMENT cho các bảng đã đổ
 --
 
 --
--- AUTO_INCREMENT for table `danh_gia`
+-- AUTO_INCREMENT cho bảng `danh_gia`
 --
 ALTER TABLE `danh_gia`
   MODIFY `id` int NOT NULL AUTO_INCREMENT;
@@ -281,60 +296,61 @@ ALTER TABLE `kho_hang`
   MODIFY `id` int NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `orders`
+-- AUTO_INCREMENT cho bảng `orders`
 --
 ALTER TABLE `orders`
   MODIFY `id` int NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `order_items`
+-- AUTO_INCREMENT cho bảng `order_items`
 --
 ALTER TABLE `order_items`
   MODIFY `id` int NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `san_pham`
+-- AUTO_INCREMENT cho bảng `san_pham`
 --
 ALTER TABLE `san_pham`
   MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
 
 --
--- AUTO_INCREMENT for table `thanh_toan`
+-- AUTO_INCREMENT cho bảng `thanh_toan`
 --
 ALTER TABLE `thanh_toan`
   MODIFY `id` int NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `users`
+-- AUTO_INCREMENT cho bảng `users`
 --
 ALTER TABLE `users`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
   MODIFY `id` int NOT NULL AUTO_INCREMENT;
 
 --
--- Constraints for dumped tables
+-- Các ràng buộc cho các bảng đã đổ
 --
 
 --
--- Constraints for table `danh_gia`
+-- Các ràng buộc cho bảng `danh_gia`
 --
 ALTER TABLE `danh_gia`
   ADD CONSTRAINT `fk_danhgia_sanpham` FOREIGN KEY (`san_pham_id`) REFERENCES `san_pham` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `fk_danhgia_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 
 --
--- Constraints for table `kho_hang`
+-- Các ràng buộc cho bảng `kho_hang`
 --
 ALTER TABLE `kho_hang`
   ADD CONSTRAINT `fk_khohang_sanpham` FOREIGN KEY (`san_pham_id`) REFERENCES `san_pham` (`id`) ON DELETE CASCADE;
 
 --
--- Constraints for table `orders`
+-- Các ràng buộc cho bảng `orders`
 --
 ALTER TABLE `orders`
   ADD CONSTRAINT `fk_orders_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL;
 
 --
--- Constraints for table `order_items`
+-- Các ràng buộc cho bảng `order_items`
 --
 ALTER TABLE `order_items`
   ADD CONSTRAINT `fk_orderitems_order` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`) ON DELETE CASCADE,
