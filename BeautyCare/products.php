@@ -91,21 +91,9 @@ $result = $conn->query($sql);
     cursor: pointer;
 }
 
-/* Nút lọc */
-.btn-primary {
-    margin-top: 15px;
-    background: #ff4d6d;
-    border: none;
-    padding: 10px 0;
-    border-radius: 6px;
-    color: white;
-    font-size: 15px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background 0.2s ease;
-}
 .btn-primary:hover {
     background: #e63c5a;
+    cursor: pointer;
 }
 
 /* Grid sản phẩm */
