@@ -1,4 +1,3 @@
-<link rel="stylesheet" href=" assets/css/style.css" />
 <nav class="main-navbar">
     <ul>
         <li><a href="index.php">Trang chủ</a></li>
