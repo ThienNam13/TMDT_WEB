@@ -1,0 +1,91 @@
+/* Reset và font */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Roboto', sans-serif;
+}
+
+/* Layout chung */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.dashboard-header {
+    margin-bottom: 30px;
+}
+
+.dashboard-header h2 {
+    font-size: 24px;
+    color: #333;
+    font-weight: 500;
+}
+
+/* Card báo cáo */
+.report-card {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    margin-bottom: 30px;
+}
+
+.report-header {
+    margin-bottom: 20px;
+}
+
+.report-header h3 {
+    font-size: 18px;
+    color: #444;
+    font-weight: 500;
+}
+
+/* Biểu đồ */
+.chart-container {
+    position: relative;
+    height: 300px;
+    width: 100%;
+}
+
+/* Bảng thống kê */
+.table-responsive {
+    overflow-x: auto;
+}
+
+.report-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.report-table th, .report-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+
+.report-table th {
+    background-color: #f8f9fa;
+    font-weight: 500;
+    color: #555;
+}
+
+.report-table tr:hover {
+    background-color: #f5f5f5;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .container {
+        padding: 15px;
+    }
+    
+    .report-card {
+        padding: 15px;
+    }
+    
+    .chart-container {
+        height: 250px;
+    }
+}
