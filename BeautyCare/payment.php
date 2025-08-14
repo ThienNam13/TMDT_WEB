@@ -359,24 +359,8 @@ $hoChiMinhWards = [
                 </div>
                 
                 <div class="form-group">
-                    <label for="khu_vuc">Quận/Huyện <span class="required">*</span></label>
-                    <select id="khu_vuc" name="khu_vuc" required>
-                        <option value="">Chọn quận/huyện</option>
-                        <?php foreach (array_keys($hoChiMinhWards) as $district): ?>
-                            <option value="<?= htmlspecialchars($district) ?>" <?= ($address && strpos($address, $district) !== false) ? 'selected' : '' ?>>
-                                <?= htmlspecialchars($district) ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                    <div class="error-message" id="khu_vuc_error"></div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="phuong_xa">Phường/Xã <span class="required">*</span></label>
-                    <select id="phuong_xa" name="phuong_xa" required>
-                        <option value="">Chọn quận/huyện trước</option>
-                    </select>
-                    <div class="error-message" id="phuong_xa_error"></div>
+                    <label for="khu_vuc">Khu vực</label>
+                    <input type="text" id="khu_vuc" name="khu_vuc" value="TP.HCM" readonly style="background-color: #f5f5f5;">
                 </div>
                 
                 <div class="form-group">
@@ -499,20 +483,6 @@ document.addEventListener('DOMContentLoaded', function() {
             isValid = false;
         }
         
-        // Validate District
-        const khuVuc = document.getElementById('khu_vuc').value;
-        if (!khuVuc) {
-            showFieldError('khu_vuc', 'Vui lòng chọn quận/huyện');
-            isValid = false;
-        }
-        
-        // Validate Ward
-        const phuongXa = document.getElementById('phuong_xa').value;
-        if (!phuongXa) {
-            showFieldError('phuong_xa', 'Vui lòng chọn phường/xã');
-            isValid = false;
-        }
-        
         return isValid;
     }
     
@@ -548,29 +518,35 @@ document.addEventListener('DOMContentLoaded', function() {
             }));
             formData.append('items', JSON.stringify(processedItems));
             
-            // Send order
-            fetch('php/process_order.php', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    showMessage('Đặt hàng thành công! Đang chuyển hướng...', 'success');
-                    setTimeout(() => {
-                        window.location.href = data.redirect || 'order-success.php';
-                    }, 2000);
-                } else {
-                    showMessage(data.message || 'Có lỗi xảy ra khi đặt hàng', 'error');
+            // Show confirmation dialog
+            if (confirm('Xác nhận thanh toán')) {
+                // Send order
+                fetch('php/process_order.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        showMessage('Đặt hàng thành công! Đang chuyển hướng...', 'success');
+                        setTimeout(() => {
+                            window.location.href = data.redirect || 'order-success.php';
+                        }, 2000);
+                    } else {
+                        showMessage(data.message || 'Có lỗi xảy ra khi đặt hàng', 'error');
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = 'Đặt hàng';
+                    }
+                })
+                .catch(error => {
+                    showMessage('Có lỗi xảy ra khi kết nối server', 'error');
                     submitBtn.disabled = false;
                     submitBtn.textContent = 'Đặt hàng';
-                }
-            })
-            .catch(error => {
-                showMessage('Có lỗi xảy ra khi kết nối server', 'error');
+                });
+            } else {
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Đặt hàng';
-            });
+            }
         });
     }
     
