@@ -51,27 +51,25 @@ if (!empty($cartItems)) {
 
 $grandTotal = $total + $shippingFee;
 
-// Ho Chi Minh City wards
-$hoChiMinhWards = [
-    'Quận 1' => ['Phường Bến Nghé', 'Phường Bến Thành', 'Phường Cầu Kho', 'Phường Cầu Ông Lãnh', 'Phường Cô Giang', 'Phường Đa Kao', 'Phường Nguyễn Cư Trinh', 'Phường Nguyễn Thái Bình', 'Phường Phạm Ngũ Lão', 'Phường Tân Định'],
-    'Quận 2' => ['Phường An Khánh', 'Phường An Lợi Đông', 'Phường An Phú', 'Phường Bình An', 'Phường Bình Khánh', 'Phường Bình Trưng Đông', 'Phường Bình Trưng Tây', 'Phường Cát Lái', 'Phường Thạnh Mỹ Lợi', 'Phường Thảo Điền', 'Phường Thủ Thiêm'],
-    'Quận 3' => ['Phường 1', 'Phường 2', 'Phường 3', 'Phường 4', 'Phường 5', 'Phường 6', 'Phường 7', 'Phường 8', 'Phường 9', 'Phường 10', 'Phường 11', 'Phường 12', 'Phường 13', 'Phường 14'],
-    'Quận 4' => ['Phường 1', 'Phường 2', 'Phường 3', 'Phường 4', 'Phường 5', 'Phường 6', 'Phường 7', 'Phường 8', 'Phường 9', 'Phường 10', 'Phường 11', 'Phường 12', 'Phường 13', 'Phường 14', 'Phường 15', 'Phường 16', 'Phường 17', 'Phường 18'],
-    'Quận 5' => ['Phường 1', 'Phường 2', 'Phường 3', 'Phường 4', 'Phường 5', 'Phường 6', 'Phường 7', 'Phường 8', 'Phường 9', 'Phường 10', 'Phường 11', 'Phường 12', 'Phường 13', 'Phường 14', 'Phường 15'],
-    'Quận 6' => ['Phường 1', 'Phường 2', 'Phường 3', 'Phường 4', 'Phường 5', 'Phường 6', 'Phường 7', 'Phường 8', 'Phường 9', 'Phường 10', 'Phường 11', 'Phường 12', 'Phường 13', 'Phường 14'],
-    'Quận 7' => ['Phường Bình Thuận', 'Phường Phú Mỹ', 'Phường Phú Thuận', 'Phường Tân Hưng', 'Phường Tân Kiểng', 'Phường Tân Phong', 'Phường Tân Phú', 'Phường Tân Quy', 'Phường Tân Thuận Đông', 'Phường Tân Thuận Tây'],
-    'Quận 8' => ['Phường 1', 'Phường 2', 'Phường 3', 'Phường 4', 'Phường 5', 'Phường 6', 'Phường 7', 'Phường 8', 'Phường 9', 'Phường 10', 'Phường 11', 'Phường 12', 'Phường 13', 'Phường 14', 'Phường 15', 'Phường 16'],
-    'Quận 9' => ['Phường Hiệp Phú', 'Phường Long Bình', 'Phường Long Phước', 'Phường Long Thạnh Mỹ', 'Phường Long Trường', 'Phường Phú Hữu', 'Phường Phước Bình', 'Phường Phước Long A', 'Phường Phước Long B', 'Phường Tăng Nhơn Phú A', 'Phường Tăng Nhơn Phú B', 'Phường Tân Phú', 'Phường Trường Thọ'],
-    'Quận 10' => ['Phường 1', 'Phường 2', 'Phường 3', 'Phường 4', 'Phường 5', 'Phường 6', 'Phường 7', 'Phường 8', 'Phường 9', 'Phường 10', 'Phường 11', 'Phường 12', 'Phường 13', 'Phường 14', 'Phường 15'],
-    'Quận 11' => ['Phường 1', 'Phường 2', 'Phường 3', 'Phường 4', 'Phường 5', 'Phường 6', 'Phường 7', 'Phường 8', 'Phường 9', 'Phường 10', 'Phường 11', 'Phường 12', 'Phường 13', 'Phường 14', 'Phường 15', 'Phường 16'],
-    'Quận 12' => ['Phường An Phú Đông', 'Phường Đông Hưng Thuận', 'Phường Hiệp Thành', 'Phường Tân Chánh Hiệp', 'Phường Tân Thới Hiệp', 'Phường Tân Thới Nhất', 'Phường Thạnh Lộc', 'Phường Thạnh Xuân', 'Phường Thới An', 'Phường Trung Mỹ Tây'],
-    'Quận Bình Tân' => ['Phường An Lạc', 'Phường An Lạc A', 'Phường Bình Hưng Hòa', 'Phường Bình Hưng Hòa A', 'Phường Bình Hưng Hòa B', 'Phường Bình Trị Đông', 'Phường Bình Trị Đông A', 'Phường Bình Trị Đông B', 'Phường Tân Tạo', 'Phường Tân Tạo A'],
-    'Quận Bình Thạnh' => ['Phường 1', 'Phường 2', 'Phường 3', 'Phường 5', 'Phường 6', 'Phường 7', 'Phường 11', 'Phường 12', 'Phường 13', 'Phường 14', 'Phường 15', 'Phường 17', 'Phường 19', 'Phường 21', 'Phường 22', 'Phường 24', 'Phường 25', 'Phường 26', 'Phường 27', 'Phường 28'],
-    'Quận Gò Vấp' => ['Phường 1', 'Phường 3', 'Phường 4', 'Phường 5', 'Phường 6', 'Phường 7', 'Phường 8', 'Phường 9', 'Phường 10', 'Phường 11', 'Phường 12', 'Phường 13', 'Phường 14', 'Phường 15', 'Phường 16', 'Phường 17'],
-    'Quận Phú Nhuận' => ['Phường 1', 'Phường 2', 'Phường 3', 'Phường 4', 'Phường 5', 'Phường 7', 'Phường 8', 'Phường 9', 'Phường 10', 'Phường 11', 'Phường 12', 'Phường 13', 'Phường 14', 'Phường 15', 'Phường 17'],
-    'Quận Tân Bình' => ['Phường 1', 'Phường 2', 'Phường 3', 'Phường 4', 'Phường 5', 'Phường 6', 'Phường 7', 'Phường 8', 'Phường 9', 'Phường 10', 'Phường 11', 'Phường 12', 'Phường 13', 'Phường 14', 'Phường 15'],
-    'Quận Tân Phú' => ['Phường Hiệp Tân', 'Phường Hòa Thạnh', 'Phường Phú Thạnh', 'Phường Phú Thọ Hòa', 'Phường Phú Trung', 'Phường Sơn Kỳ', 'Phường Tân Quý', 'Phường Tân Sơn Nhì', 'Phường Tân Thành', 'Phường Tân Thới Hòa', 'Phường Tây Thạnh'],
-    'Quận Thủ Đức' => ['Phường An Khánh', 'Phường An Lợi Đông', 'Phường An Phú', 'Phường Bình Chiểu', 'Phường Bình Thọ', 'Phường Hiệp Bình Chánh', 'Phường Hiệp Bình Phước', 'Phường Linh Chiểu', 'Phường Linh Đông', 'Phường Linh Tây', 'Phường Linh Trung', 'Phường Linh Xuân', 'Phường Tam Bình', 'Phường Tam Phú', 'Phường Trường Thọ']
+// Danh sách phường/xã TP.HCM (sau sáp nhập - mẫu, có thể bổ sung/điều chỉnh)
+$hcmWards = [
+    // Q1 cũ
+    'Phường Bến Nghé','Phường Bến Thành','Phường Cầu Kho','Phường Cầu Ông Lãnh','Phường Cô Giang',
+    'Phường Đa Kao','Phường Nguyễn Cư Trinh','Phường Nguyễn Thái Bình','Phường Phạm Ngũ Lão','Phường Tân Định',
+    // Khu Thủ Đức (TP. Thủ Đức)
+    'Phường Thảo Điền','Phường An Phú','Phường An Khánh','Phường Thủ Thiêm','Phường Bình An','Phường Bình Khánh',
+    'Phường Cát Lái','Phường Thạnh Mỹ Lợi','Phường An Lợi Đông','Phường Hiệp Phú','Phường Long Bình','Phường Long Phước',
+    'Phường Long Thạnh Mỹ','Phường Long Trường','Phường Phú Hữu','Phường Phước Bình','Phường Phước Long A','Phường Phước Long B',
+    'Phường Tăng Nhơn Phú A','Phường Tăng Nhơn Phú B','Phường Tân Phú','Phường Trường Thọ','Phường Linh Chiểu','Phường Linh Tây',
+    'Phường Linh Trung','Phường Linh Xuân','Phường Linh Đông','Phường Bình Thọ','Phường Bình Chiểu','Phường Hiệp Bình Chánh','Phường Hiệp Bình Phước',
+    'Phường Tam Bình','Phường Tam Phú',
+    // Bình Thạnh cũ
+    'Phường Gia Định', 'Phường Bình Thạnh', 'Phường Bình Lợi Trung', 'Phường Thạnh Mỹ Tây', 'Phường Bình Quới',
+    // Q7 cũ
+    'Phường Tân Phú','Phường Tân Phong','Phường Tân Quy','Phường Tân Kiểng','Phường Tân Hưng','Phường Bình Thuận',
+    'Phường Phú Thuận','Phường Tân Thuận Đông','Phường Tân Thuận Tây','Phường Phú Mỹ',
+    // Q4 cũ
+    'Phường Khánh Hội', 'Phường Vĩnh Hội', 'Phường Xóm Chiếu',
 ];
 ?>
 
@@ -353,11 +351,22 @@ $hoChiMinhWards = [
                 </div>
                 
                 <div class="form-group">
-                    <label for="dia_chi">Địa chỉ <span class="required">*</span></label>
-                    <textarea id="dia_chi" name="dia_chi" placeholder="Nhập địa chỉ chi tiết (số nhà, tên đường)" required><?= htmlspecialchars($address ?? '') ?></textarea>
+                    <label for="dia_chi">Số nhà, tên đường <span class="required">*</span></label>
+                    <input type="text" id="dia_chi" name="dia_chi" placeholder="Ví dụ: 123 Lý Thường Kiệt" value="<?= htmlspecialchars($address ?? '') ?>" required>
                     <div class="error-message" id="dia_chi_error"></div>
                 </div>
-                
+
+                <div class="form-group">
+                    <label for="phuong_xa">Phường/Xã <span class="required">*</span></label>
+                    <input list="phuongList" id="phuong_xa" name="phuong_xa" placeholder="Gõ để chọn phường/xã" required>
+                    <datalist id="phuongList">                        <option value="">-- Chọn phường/xã --</option>
+                        <?php foreach ($hcmWards as $ward): ?>
+                            <option value="<?= htmlspecialchars($ward) ?>">
+                        <?php endforeach; ?>
+                    </datalist>
+                    <div class="error-message" id="phuong_xa_error"></div>
+                </div>
+
                 <div class="form-group">
                     <label for="khu_vuc">Khu vực</label>
                     <input type="text" id="khu_vuc" name="khu_vuc" value="TP.HCM" readonly style="background-color: #f5f5f5;">
@@ -412,54 +421,37 @@ $hoChiMinhWards = [
     <?php endif; ?>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('paymentForm');
     const messageDiv = document.getElementById('message');
-    const khuVucSelect = document.getElementById('khu_vuc');
-    const phuongXaSelect = document.getElementById('phuong_xa');
-    
-    // Ho Chi Minh City wards data
-    const hoChiMinhWards = <?= json_encode($hoChiMinhWards) ?>;
-    
-    // Update wards when district changes
-    khuVucSelect.addEventListener('change', function() {
-        const selectedDistrict = this.value;
-        phuongXaSelect.innerHTML = '<option value="">Chọn phường/xã</option>';
-        
-        if (selectedDistrict && hoChiMinhWards[selectedDistrict]) {
-            hoChiMinhWards[selectedDistrict].forEach(ward => {
-                const option = document.createElement('option');
-                option.value = ward;
-                option.textContent = ward;
-                phuongXaSelect.appendChild(option);
-            });
-        }
-    });
-    
-    // Payment method selection
+
+    // Chọn phương thức thanh toán (giữ nguyên logic cũ của bạn nếu đã có)
     const paymentMethods = document.querySelectorAll('.payment-method');
     paymentMethods.forEach(method => {
         method.addEventListener('click', function() {
-            // Remove selected class from all methods
             paymentMethods.forEach(m => m.classList.remove('selected'));
-            // Add selected class to clicked method
             this.classList.add('selected');
-            // Check the radio button
-            const radio = this.querySelector('input[type="radio"]');
-            radio.checked = true;
+            this.querySelector('input[type="radio"]').checked = true;
         });
     });
-    
-    // Form validation
+
+    function showFieldError(fieldId, message) {
+        const field = document.getElementById(fieldId);
+        const errorDiv = document.getElementById(fieldId + '_error');
+        field.classList.add('error');
+        errorDiv.textContent = message;
+        errorDiv.style.display = 'block';
+    }
+
     function validateForm() {
         let isValid = true;
-        
-        // Clear previous errors
+
         document.querySelectorAll('.error-message').forEach(el => el.style.display = 'none');
-        document.querySelectorAll('.form-group input, .form-group textarea, .form-group select').forEach(el => el.classList.remove('error'));
-        
-        // Validate Full Name
+        document.querySelectorAll('.form-group input, .form-group textarea, .form-group select')
+            .forEach(el => el.classList.remove('error'));
+
         const hoTen = document.getElementById('ho_ten').value.trim();
         if (hoTen.length < 2) {
             showFieldError('ho_ten', 'Họ tên phải có ít nhất 2 ký tự');
@@ -468,101 +460,87 @@ document.addEventListener('DOMContentLoaded', function() {
             showFieldError('ho_ten', 'Họ tên chỉ được chứa chữ cái và khoảng trắng');
             isValid = false;
         }
-        
-        // Validate Phone Number
+
         const sdt = document.getElementById('sdt').value.trim();
         if (!/^[0-9]{10,11}$/.test(sdt)) {
             showFieldError('sdt', 'Số điện thoại phải có 10-11 chữ số');
             isValid = false;
         }
-        
-        // Validate Address
+
         const diaChi = document.getElementById('dia_chi').value.trim();
-        if (diaChi.length < 10) {
-            showFieldError('dia_chi', 'Địa chỉ phải có ít nhất 10 ký tự');
+        if (diaChi.length < 5) {
+            showFieldError('dia_chi', 'Địa chỉ phải có ít nhất 5 ký tự');
             isValid = false;
         }
-        
+
+        const phuongXa = document.getElementById('phuong_xa').value.trim();
+        if (phuongXa === "") {
+            showFieldError('phuong_xa', 'Vui lòng chọn phường/xã');
+            isValid = false;
+        }
+
         return isValid;
     }
-    
-    function showFieldError(fieldId, message) {
-        const field = document.getElementById(fieldId);
-        const errorDiv = document.getElementById(fieldId + '_error');
-        field.classList.add('error');
-        errorDiv.textContent = message;
-        errorDiv.style.display = 'block';
-    }
-    
-    // Form submission
-    if (form) {
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            if (!validateForm()) {
-                return;
-            }
-            
-            const submitBtn = form.querySelector('.submit-btn');
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Đang xử lý...';
-            
-            // Get form data
-            const formData = new FormData(form);
-            
-            // Add cart items to form data with correct field names
-            const cartItems = <?= json_encode($cartDetails) ?>;
-            const processedItems = cartItems.map(item => ({
-                id: item.id,
-                quantity: item.qty
-            }));
-            formData.append('items', JSON.stringify(processedItems));
-            
-            // Show confirmation dialog
-            if (confirm('Xác nhận thanh toán')) {
-                // Send order
-                fetch('php/process_order.php', {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.status === 'success') {
-                        showMessage('Đặt hàng thành công! Đang chuyển hướng...', 'success');
-                        setTimeout(() => {
-                            window.location.href = data.redirect || 'order-success.php';
-                        }, 2000);
-                    } else {
-                        showMessage(data.message || 'Có lỗi xảy ra khi đặt hàng', 'error');
-                        submitBtn.disabled = false;
-                        submitBtn.textContent = 'Đặt hàng';
-                    }
-                })
-                .catch(error => {
-                    showMessage('Có lỗi xảy ra khi kết nối server', 'error');
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = 'Đặt hàng';
-                });
-            } else {
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Đặt hàng';
-            }
-        });
-    }
-    
+
     function showMessage(message, type) {
         messageDiv.textContent = message;
         messageDiv.className = `alert ${type}`;
         messageDiv.style.display = 'block';
-        
-        setTimeout(() => {
-            messageDiv.style.display = 'none';
-        }, 5000);
+        setTimeout(() => { messageDiv.style.display = 'none'; }, 5000);
     }
-    
-    // Initialize wards if district is pre-selected
-    if (khuVucSelect.value) {
-        khuVucSelect.dispatchEvent(new Event('change'));
+
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            if (!validateForm()) return;
+
+            const submitBtn = form.querySelector('.submit-btn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Đang xử lý...';
+
+            const formData = new FormData(form);
+
+            // Gói items (giống code bạn đang có)
+            const cartItems = <?= json_encode($cartDetails) ?>;
+            const processedItems = cartItems.map(item => ({ id: item.id, quantity: item.qty }));
+            formData.append('items', JSON.stringify(processedItems));
+
+            Swal.fire({
+                title: 'Xác nhận thanh toán?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Xác nhận',
+                cancelButtonText: 'Hủy'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({ title:'Đang xử lý...', didOpen:()=>Swal.showLoading(), allowOutsideClick:false });
+
+                    fetch('php/process_order.php', { method: 'POST', body: formData })
+                        .then(r => r.json())
+                        .then(data => {
+                            Swal.close();
+                            Swal.fire({
+                                icon: data.status === 'success' ? 'success' : 'error',
+                                title: data.status === 'success' ? 'Đặt hàng thành công' : 'Lỗi',
+                                text: data.message,
+                                timer: data.status === 'success' ? 2000 : undefined,
+                                showConfirmButton: data.status !== 'success'
+                            }).then(() => {
+                                if (data.status === 'success') {
+                                    window.location.href = data.redirect || 'order-success.php';
+                                }
+                            });
+                        })
+                        .catch(() => {
+                            Swal.close();
+                            Swal.fire('Lỗi','Không thể kết nối tới server','error');
+                        });
+                } else {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Đặt hàng';
+                }
+            });
+        });
     }
 });
 </script>
