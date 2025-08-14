@@ -105,6 +105,10 @@ foreach ($items as $it) {
     ];
 }
 
+// Add shipping fee to match the total displayed in payment form
+$shippingFee = 15000; // 15,000 VND (same as in payment.php)
+$grandTotal = $total + $shippingFee; // Total including shipping fee
+
 try {
     $conn->begin_transaction();
 
@@ -120,7 +124,7 @@ try {
         $diaChi,
         $phuongXa,
         $khuVuc,
-        $total,
+        $grandTotal,
         $ghiChu,
         $hinhThucThanhToan
     );
