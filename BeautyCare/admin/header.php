@@ -17,7 +17,7 @@
         <div class="user-info">
             <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="User">
             <div class="user-details">
-                <h3>Nguyễn Thị Hoa</h3>
+                <h3>Admin</h3>
                 <p>Quản lý hệ thống</p>
             </div>
         </div>

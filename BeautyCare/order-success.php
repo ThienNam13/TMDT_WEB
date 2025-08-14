@@ -40,7 +40,7 @@ $orderItems = [];
 
 if ($orderId) {
     // Load order
-    $stmt = $conn->prepare("SELECT id, ma_don, ho_ten, sdt, dia_chi, phuong_xa, khu_vuc, tong_tien, thoi_gian_dat, trang_thai, hinh_thuc_thanh_toan FROM orders WHERE id = ?");
+    $stmt = $conn->prepare("SELECT id, ma_don, ho_ten, sdt, dia_chi, phuong_xa, khu_vuc, tong_tien, thoi_gian_dat, trang_thai, hinh_thuc_thanh_toan, ghi_chu FROM orders WHERE id = ?");
     $stmt->bind_param("i", $orderId);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -50,7 +50,7 @@ if ($orderId) {
     $stmt->close();
 
     if ($order) {
-        // Load items
+        // Load items with exact quantities and prices from order_items table
         $stmt = $conn->prepare("SELECT oi.san_pham_id, oi.so_luong, oi.don_gia, sp.ten_san_pham, sp.hinh_anh FROM order_items oi JOIN san_pham sp ON sp.id = oi.san_pham_id WHERE oi.order_id = ?");
         $stmt->bind_param("i", $orderId);
         $stmt->execute();
@@ -59,6 +59,15 @@ if ($orderId) {
             $orderItems[] = $row;
         }
         $stmt->close();
+    }
+}
+
+// Calculate shipping fee (same as in payment.php)
+$shippingFee = 15000; // 15,000 VND
+$subtotal = 0;
+if (!empty($orderItems)) {
+    foreach ($orderItems as $item) {
+        $subtotal += (float)$item['don_gia'] * (int)$item['so_luong'];
     }
 }
 ?>
@@ -121,10 +130,12 @@ if ($orderId) {
                 <?php echo htmlspecialchars($order['ho_ten']); ?> - <?php echo htmlspecialchars($order['sdt']); ?><br>
                 <?php echo htmlspecialchars($order['dia_chi']); ?><?php echo $order['phuong_xa'] ? ', ' . htmlspecialchars($order['phuong_xa']) : ''; ?>, <?php echo htmlspecialchars($order['khu_vuc']); ?>
             </div>
+            <?php if ($order['ghi_chu']): ?>
             <div class="box">
-                <strong>Tổng tiền</strong><br>
-                <span style="color:#e63c5a; font-weight:bold;"><?php echo number_format((float)$order['tong_tien'], 0, ',', '.'); ?> VND</span>
+                <strong>Ghi chú</strong><br>
+                <?php echo htmlspecialchars($order['ghi_chu']); ?>
             </div>
+            <?php endif; ?>
         </div>
 
         <h3>Chi tiết sản phẩm</h3>
@@ -138,7 +149,7 @@ if ($orderId) {
                 </tr>
             </thead>
             <tbody>
-                <?php $sum = 0; foreach ($orderItems as $item): $line = (float)$item['don_gia'] * (int)$item['so_luong']; $sum += $line; ?>
+                <?php foreach ($orderItems as $item): ?>
                     <tr>
                         <td>
                             <div class="product-cell">
@@ -150,12 +161,16 @@ if ($orderId) {
                         </td>
                         <td><?php echo (int)$item['so_luong']; ?></td>
                         <td><?php echo number_format((float)$item['don_gia'], 0, ',', '.'); ?> VND</td>
-                        <td><?php echo number_format($line, 0, ',', '.'); ?> VND</td>
+                        <td><?php echo number_format((float)$item['don_gia'] * (int)$item['so_luong'], 0, ',', '.'); ?> VND</td>
                     </tr>
                 <?php endforeach; ?>
                 <tr class="total-row">
                     <td colspan="3" style="text-align:right;">Tạm tính</td>
-                    <td><?php echo number_format($sum, 0, ',', '.'); ?> VND</td>
+                    <td><?php echo number_format($subtotal, 0, ',', '.'); ?> VND</td>
+                </tr>
+                <tr class="total-row">
+                    <td colspan="3" style="text-align:right;">Phí vận chuyển</td>
+                    <td><?php echo number_format($shippingFee, 0, ',', '.'); ?> VND</td>
                 </tr>
                 <tr class="total-row">
                     <td colspan="3" style="text-align:right;">Tổng thanh toán</td>
