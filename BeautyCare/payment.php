@@ -25,7 +25,9 @@ $shippingFee = 15000; // 15,000 VND
 
 // Calculate total from cart items
 if (!empty($cartItems)) {
-    foreach ($cartItems as $productId => $quantity) {
+    foreach ($cartItems as $productId => $item) {
+        $quantity = $item['qty'] ?? 1;
+
         $stmt = $conn->prepare("SELECT gia FROM san_pham WHERE id = ?");
         $stmt->bind_param("i", $productId);
         $stmt->execute();

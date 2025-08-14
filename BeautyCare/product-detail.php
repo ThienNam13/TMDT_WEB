@@ -49,6 +49,10 @@ $reviews = $conn->query($sql_reviews);
 ?>
 
 <style>
+.btn-primary:hover {
+    background: #b5838d;
+    cursor: pointer;
+}
 .product-detail-page {
     display: flex;
     gap: 30px;

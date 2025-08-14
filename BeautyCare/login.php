@@ -60,60 +60,84 @@
     </div>
 </div>
 
-<script>
-    const signUpButton = document.getElementById('signUp');
-    const signInButton = document.getElementById('signIn');
-    const container = document.querySelector('.auth-container');
-
-    signUpButton.addEventListener('click', () => {
-        container.classList.add("right-panel-active");
-    });
-
-    signInButton.addEventListener('click', () => {
-        container.classList.remove("right-panel-active");
-    });
-</script>
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
-function showMessage(type, text) {
-    const box = document.getElementById('authMessage');
-    box.className = `alert ${type}`;
-    box.textContent = text;
-    box.style.display = 'block';
+const signUpButton = document.getElementById('signUp');
+const signInButton = document.getElementById('signIn');
+const container = document.querySelector('.auth-container');
+
+signUpButton.addEventListener('click', () => {
+    container.classList.add("right-panel-active");
+});
+
+signInButton.addEventListener('click', () => {
+    container.classList.remove("right-panel-active");
+});
+
+function sweetAlertLoading(text = 'Vui lòng chờ...') {
+    Swal.fire({
+        title: text,
+        allowOutsideClick: false,
+        didOpen: () => {
+            Swal.showLoading();
+        }
+    });
 }
 
 document.getElementById('loginForm').addEventListener('submit', function(e) {
     e.preventDefault();
+    sweetAlertLoading('Đang đăng nhập...');
+
     fetch('php/login_process.php', {
         method: 'POST',
         body: new FormData(this)
     })
     .then(res => res.json())
     .then(data => {
-        if (data.status === 'success') {
-            showMessage('success', data.message);
-            setTimeout(() => window.location.href = 'index.php', 1000);
-        } else {
-            showMessage('error', data.message);
-        }
+        Swal.close();
+        Swal.fire({
+            icon: data.status === 'success' ? 'success' : 'error',
+            title: data.status === 'success' ? 'Thành công' : 'Lỗi',
+            text: data.message
+        }).then(() => {
+            if (data.status === 'success') {
+                window.location.href = 'index.php';
+            }
+        });
+    })
+    .catch(() => {
+        Swal.close();
+        Swal.fire('Lỗi', 'Không thể kết nối tới máy chủ', 'error');
     });
 });
 
 document.getElementById('registerForm').addEventListener('submit', function(e) {
     e.preventDefault();
+    sweetAlertLoading('Đang đăng ký...');
+
     fetch('php/register_process.php', {
         method: 'POST',
         body: new FormData(this)
     })
     .then(res => res.json())
     .then(data => {
-        if (data.status === 'success') {
-            showMessage('success', data.message);
-            // Chuyển qua form đăng nhập
-            document.querySelector('.auth-container').classList.remove("right-panel-active");
-        } else {
-            showMessage('error', data.message);
-        }
+        Swal.close();
+        Swal.fire({
+            icon: data.status === 'success' ? 'success' : 'error',
+            title: data.status === 'success' ? 'Thành công' : 'Lỗi',
+            text: data.message
+        }).then(() => {
+            if (data.status === 'success') {
+                container.classList.remove("right-panel-active");
+                document.getElementById('registerForm').reset();
+            }
+        });
+    })
+    .catch(() => {
+        Swal.close();
+        Swal.fire('Lỗi', 'Không thể kết nối tới máy chủ', 'error');
     });
 });
 </script>

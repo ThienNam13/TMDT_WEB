@@ -92,7 +92,7 @@ $result = $conn->query($sql);
 }
 
 .btn-primary:hover {
-    background: #e63c5a;
+    background: #b5838d;
     cursor: pointer;
 }
 
