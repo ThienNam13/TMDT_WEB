@@ -20,6 +20,7 @@ body {
     text-decoration: none;
     display: inline-block;
     transition: background 0.3s;
+    cursor: pointer;
 }
 .btn-primary:hover {
     background: #b5838d;
