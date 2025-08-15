@@ -125,7 +125,10 @@ $stmt_count->close();
     color: green;
     font-weight: bold;
 }
-.btn-primary{
+
+
+button, 
+.view-more-reviews-btn {
     cursor: pointer;
 }
 </style>
