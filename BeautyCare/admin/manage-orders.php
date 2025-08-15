@@ -413,12 +413,12 @@ document.querySelectorAll('.btn-update-status').forEach(btn => {
                 icon: 'info',
                 showCancelButton: true,
                 showDenyButton: true,
-                confirmButtonText: 'Xác nhận hoàn tất',
+                confirmButtonText: 'Xác nhận yêu cầu',
                 denyButtonText: 'Từ chối yêu cầu',
                 cancelButtonText: 'Đóng'
             }).then(result => {
                 if (result.isConfirmed) {
-                    updateStatus(orderId, 'Hoàn tất');
+                    updateStatus(orderId, 'Đã hủy');
                 } else if (result.isDenied) {
                     updateStatus(orderId, 'Đang giao');
                 }
