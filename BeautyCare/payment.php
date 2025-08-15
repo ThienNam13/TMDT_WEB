@@ -1,14 +1,15 @@
 <?php
-include 'includes/header.php';
-include 'includes/navbar.php';
+session_start();
 
-// Check if user is logged in
+// Kiểm tra đăng nhập trước khi xuất bất kỳ nội dung nào
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit;
 }
 
 include 'php/database.php';
+include 'includes/header.php';
+include 'includes/navbar.php';
 
 // Get user information including phone and address
 $stmt = $conn->prepare("SELECT fullname, email, phone, address FROM users WHERE id = ?");
