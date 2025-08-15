@@ -6,6 +6,9 @@ include 'includes/navbar.php';
 // Lấy category từ GET
 $category = isset($_GET['category']) ? $conn->real_escape_string($_GET['category']) : null;
 $brands = isset($_GET['brand']) && is_array($_GET['brand']) ? $_GET['brand'] : [];
+// Định nghĩa biến tìm kiếm từ URL
+$search_term = isset($_GET['search']) ? $conn->real_escape_string($_GET['search']) : null;
+
 
 // Lấy mã danh mục từ tên danh mục
 $ma_danh_muc = null;
@@ -28,6 +31,10 @@ if ($ma_danh_muc) {
 
 // Truy vấn sản phẩm
 $sql = "SELECT * FROM san_pham WHERE is_available = 1";
+if ($search_term) {
+    $sql .= " AND ten_san_pham LIKE '%$search_term%'";
+}
+
 if ($ma_danh_muc) {
     $sql .= " AND ma_danh_muc = $ma_danh_muc";
 }
@@ -91,21 +98,9 @@ $result = $conn->query($sql);
     cursor: pointer;
 }
 
-/* Nút lọc */
-.btn-primary {
-    margin-top: 15px;
-    background: #ff4d6d;
-    border: none;
-    padding: 10px 0;
-    border-radius: 6px;
-    color: white;
-    font-size: 15px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background 0.2s ease;
-}
 .btn-primary:hover {
-    background: #e63c5a;
+    background: #b5838d;
+    cursor: pointer;
 }
 
 /* Grid sản phẩm */
@@ -154,11 +149,13 @@ $result = $conn->query($sql);
 
 <div class="container products-page">
 
-    <!-- Sidebar lọc -->
     <aside class="filter-sidebar">
         <form method="GET" action="">
             <?php if ($category): ?>
                 <input type="hidden" name="category" value="<?php echo htmlspecialchars($category); ?>">
+            <?php endif; ?>
+             <?php if ($search_term): ?>
+                <input type="hidden" name="search" value="<?php echo htmlspecialchars($search_term); ?>">
             <?php endif; ?>
 
             <h3>Thương hiệu</h3>
@@ -175,17 +172,19 @@ $result = $conn->query($sql);
         </form>
     </aside>
 
-    <!-- Danh sách sản phẩm -->
     <section class="product-list" style="flex: 1;">
         <div class="product-grid">
             <?php
             if ($result && $result->num_rows > 0) {
                 while ($row = $result->fetch_assoc()) {
                     echo '<div class="product-card">';
-                    echo '<img src="assets/img/products/' . htmlspecialchars($row['hinh_anh']) . '" alt="' . htmlspecialchars($row['ten_san_pham']) . '">';
+                    // Thêm biến $base_url để đường dẫn ảnh chính xác
+                    echo '<a href="' . $base_url . 'php/product-detail.php?id=' . intval($row['id']) . '">';
+                    echo '<img src="' . $base_url . 'assets/img/products/' . htmlspecialchars($row['hinh_anh']) . '" alt="' . htmlspecialchars($row['ten_san_pham']) . '">';
+                    echo '</a>';
                     echo '<h3>' . htmlspecialchars($row['ten_san_pham']) . '</h3>';
                     echo '<p class="price" style="color: red; font-weight: bold;">' . number_format($row['gia'], 0, ',', '.') . ' VND</p>';
-                    echo '<a href="product-detail.php?id=' . intval($row['id']) . '" class="btn-primary">Xem chi tiết</a>';
+                    echo '<a href="' . $base_url . 'php/product-detail.php?id=' . intval($row['id']) . '" class="btn-primary">Xem chi tiết</a>';
                     echo '</div>';
                 }
             } else {

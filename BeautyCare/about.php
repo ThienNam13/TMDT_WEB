@@ -1,6 +1,8 @@
 <?php
 $pageTitle = "Giới thiệu";
 include 'includes/header.php';
+include 'includes/navbar.php';
+
 ?>
 <h1>GIỚI THIỆU VỀ BEAUTYCARE</h1>
 <p><strong>BeautyCare</strong> được thành lập với sứ mệnh mang đến vẻ đẹp rạng rỡ và sự tự tin cho phụ nữ Việt Nam thông qua những sản phẩm mỹ phẩm chính hãng, chất lượng cao và an toàn tuyệt đối. Chúng tôi tin rằng, mỗi người phụ nữ đều xứng đáng được tỏa sáng với vẻ đẹp riêng của mình.</p>
