@@ -1,0 +1,8 @@
+# Tắt directory listing
+Options -Indexes
+
+# Chuyển hướng khi truy cập thư mục
+DirectoryIndex index.php dashboard.php
+
+# Ẩn thông tin server
+ServerSignature Off
