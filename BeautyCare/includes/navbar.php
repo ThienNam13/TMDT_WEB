@@ -2,7 +2,7 @@
 // Đường dẫn gốc của trang web, cần được định nghĩa ở đây
 // để navbar hoạt động độc lập hoặc bạn có thể chắc chắn nó
 // đã được định nghĩa trong header.php
-$base_url = '/TMDT_WEB-main/BeautyCare/';
+$base_url = '../BeautyCare/';
 ?>
 <nav class="main-navbar">
     <ul>
