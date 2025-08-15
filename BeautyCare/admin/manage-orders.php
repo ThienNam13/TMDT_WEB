@@ -10,7 +10,8 @@ $sql = "SELECT
             o.sdt AS customer_phone, 
             o.thoi_gian_dat AS order_date, 
             o.tong_tien AS total_amount, 
-            o.trang_thai AS status
+            o.trang_thai AS status,
+            o.cancel_reason
         FROM orders o
         ORDER BY o.thoi_gian_dat DESC 
         LIMIT 50";
@@ -92,9 +93,18 @@ if (!$result) {
                                                 <a href="order_detail.php?id=<?= $row['id'] ?>" class="btn-icon" title="Xem chi tiết">
                                                     <i class="fas fa-eye"></i>
                                                 </a>
-                                                <a href="edit_order.php?id=<?= $row['id'] ?>" class="btn-icon" title="Sửa">
-                                                    <i class="fas fa-edit"></i>
-                                                </a>
+                                                <?php if($row['status'] == 'Đang xử lý'): ?>
+                                                    <button class="btn-icon btn-change-status" data-id="<?= $row['id'] ?>" data-status="Đang giao" title="Chuyển sang Đang giao">
+                                                        <i class="fas fa-truck"></i>
+                                                    </button>
+                                                <?php elseif($row['status'] == 'Yêu cầu trả hàng'): ?>
+                                                    <button class="btn-icon btn-change-status" data-id="<?= $row['id'] ?>" data-status="Đã hủy" title="Chấp nhận yêu cầu">
+                                                        <i class="fas fa-check text-success"></i>
+                                                    </button>
+                                                    <button class="btn-icon btn-change-status" data-id="<?= $row['id'] ?>" data-status="Hoàn tất" title="Từ chối yêu cầu">
+                                                        <i class="fas fa-times text-danger"></i>
+                                                    </button>
+                                                <?php endif; ?>
                                             </div>
                                         </td>
                                     </tr>
@@ -118,14 +128,46 @@ if (!$result) {
 </main>
 
 <script>
-    // Xác nhận trước khi xóa (nếu có chức năng xóa)
-    document.querySelectorAll('.btn-delete').forEach(btn => {
-        btn.addEventListener('click', function(e) {
-            if (!confirm('Bạn có chắc chắn muốn xóa đơn hàng này?')) {
-                e.preventDefault();
+    // Xác nhận trước khi xóa
+document.querySelectorAll('.btn-delete').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+        if (!confirm('Bạn có chắc chắn muốn xóa đơn hàng này?')) {
+            e.preventDefault();
+        }
+    });
+});
+document.querySelectorAll('.btn-change-status').forEach(btn => {
+    btn.addEventListener('click', function(){
+        let orderId = this.dataset.id;
+        let newStatus = this.dataset.status;
+
+        Swal.fire({
+            title: 'Xác nhận',
+            text: `Bạn có chắc muốn chuyển trạng thái đơn hàng sang "${newStatus}"?`,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Xác nhận',
+            cancelButtonText: 'Hủy'
+        }).then(result => {
+            if (result.isConfirmed) {
+                fetch('update_order_status.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: `id=${orderId}&status=${encodeURIComponent(newStatus)}`
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire('Thành công', data.message, 'success')
+                            .then(() => location.reload());
+                    } else {
+                        Swal.fire('Lỗi', data.message, 'error');
+                    }
+                });
             }
         });
     });
+});
 </script>
 </body>
 </html>

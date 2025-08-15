@@ -79,7 +79,7 @@ if ($orderId) {
             'Đang xử lý'   => '#f8d01fff',
             'Đang giao'    => '#87d5ffff',
             'Hoàn tất'   => '#4caf50',
-            'Đã hủy'       => '#f44336',
+            'Đã hủy'       => '#f8655bff',
             'Yêu cầu trả hàng' => '#f2a711ff',
         ];
         $color = $colors[$status] ?? '#607d8b';
