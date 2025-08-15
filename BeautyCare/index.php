@@ -78,8 +78,6 @@ include 'php/database.php'; // Kết nối CSDL
     </div>
 </section>
 
-<?php include 'includes/footer.php'; ?>
-
 <!-- SwiperJS -->
 <link rel="stylesheet" href=" assets/css/style.css" />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.css" />
@@ -100,3 +98,4 @@ setTimeout(() => {
     });
 }, 3000); // 3 giây
 </script>
+<?php include 'includes/footer.php'; ?>

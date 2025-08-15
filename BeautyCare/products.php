@@ -179,12 +179,12 @@ $result = $conn->query($sql);
                 while ($row = $result->fetch_assoc()) {
                     echo '<div class="product-card">';
                     // Thêm biến $base_url để đường dẫn ảnh chính xác
-                    echo '<a href="' . $base_url . 'php/product-detail.php?id=' . intval($row['id']) . '">';
+                    echo '<a href="' . $base_url . 'product-detail.php?id=' . intval($row['id']) . '">';
                     echo '<img src="' . $base_url . 'assets/img/products/' . htmlspecialchars($row['hinh_anh']) . '" alt="' . htmlspecialchars($row['ten_san_pham']) . '">';
                     echo '</a>';
                     echo '<h3>' . htmlspecialchars($row['ten_san_pham']) . '</h3>';
                     echo '<p class="price" style="color: red; font-weight: bold;">' . number_format($row['gia'], 0, ',', '.') . ' VND</p>';
-                    echo '<a href="' . $base_url . 'php/product-detail.php?id=' . intval($row['id']) . '" class="btn-primary">Xem chi tiết</a>';
+                    echo '<a href="' . $base_url . 'product-detail.php?id=' . intval($row['id']) . '" class="btn-primary">Xem chi tiết</a>';
                     echo '</div>';
                 }
             } else {
