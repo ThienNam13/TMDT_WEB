@@ -118,7 +118,7 @@ $recentOrdersRes = $conn->query("SELECT id, tong_tien, thoi_gian_dat, trang_thai
                 </div>
             </a>
 
-            <a href="products.php" class="stat-card">
+            <a href="manage-products.php" class="stat-card">
                 <div class="stat-icon bg-purple"><i class="fas fa-box-open"></i></div>
                 <div class="stat-info">
                     <h3>Tổng sản phẩm</h3>
@@ -136,7 +136,7 @@ $recentOrdersRes = $conn->query("SELECT id, tong_tien, thoi_gian_dat, trang_thai
                 </div>
             </div>
 
-            <a href="customers.php" class="stat-card">
+            <a href="manage-customers.php" class="stat-card">
                 <div class="stat-icon bg-red"><i class="fas fa-users"></i></div>
                 <div class="stat-info">
                     <h3>Khách hàng mới</h3>

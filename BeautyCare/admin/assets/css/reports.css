@@ -89,3 +89,53 @@
         height: 250px;
     }
 }
+/* Thêm vào file reports.css */
+@media (max-width: 768px) {
+    .report-filters .filter-group {
+        display: block;
+        margin-right: 0;
+        margin-bottom: 10px;
+    }
+    
+    .report-filters .btn {
+        display: block;
+        width: 100%;
+        margin: 5px 0;
+    }
+    
+    .chart-container {
+        height: 300px !important;
+    }
+    
+    .report-table {
+        font-size: 14px;
+    }
+    
+    .kpi-card {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .kpi-icon {
+        margin-right: 0;
+        margin-bottom: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .report-card {
+        padding: 10px;
+    }
+    
+    .report-header h3 {
+        font-size: 18px;
+    }
+    
+    .kpi-value {
+        font-size: 18px;
+    }
+    
+    .kpi-label {
+        font-size: 13px;
+    }
+}

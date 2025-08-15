@@ -29,11 +29,11 @@
     <div class="container">
         <ul class="nav-menu">
             <li><a href="dashboard.php" class="active"><i class="fas fa-home"></i> Trang chủ</a></li>
-            <li><a href="products.php"><i class="fas fa-box"></i> Sản phẩm</a></li>
+            <li><a href="manage-products.php"><i class="fas fa-box"></i> Sản phẩm</a></li>
             <li><a href="manage-inventory.php"><i class="fas fa-warehouse"></i> Kho hàng</a></li>
             <li><a href="manage-orders.php"><i class="fas fa-file-invoice-dollar"></i> Đơn hàng</a></li>
-            <li><a href="customers.php"><i class="fas fa-users"></i> Khách hàng</a></li>
-            <li><a href="reports.php"><i class="fas fa-chart-line"></i> Báo cáo</a></li>
+            <li><a href="manage-customers.php"></i> Khách hàng</a></li>
+            <li><a href="manage-reports.php"><i class="fas fa-chart-line"></i> Báo cáo</a></li>
             <li><a href="logs.php"><i class="fas fa-cog"></i> Lịch sử hệ thống</a></li>
         </ul>
     </div>
