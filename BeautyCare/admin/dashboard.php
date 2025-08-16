@@ -3,6 +3,7 @@
 include '../php/database.php';
 include 'header.php';
 
+
 // Hàm tính % tăng trưởng
 function calcGrowth($current, $previous) {
     if ($previous == 0) return $current > 0 ? 100 : 0;
