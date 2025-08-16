@@ -1,6 +1,14 @@
 <?php
 include '../php/database.php';
 include 'header.php';
+// Auto update orders: "Đang giao" quá 7 ngày -> "Hoàn tất"
+// $conn->query("
+//     UPDATE orders 
+//     SET trang_thai = 'Hoàn tất' 
+//     WHERE trang_thai = 'Đang giao'
+//       AND thoi_gian_giao IS NOT NULL
+//       AND thoi_gian_giao < (NOW() - INTERVAL 7 DAY)
+// ");
 
 // Initialize variables
 $search = isset($_GET['search']) ? trim($_GET['search']) : '';

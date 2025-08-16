@@ -1,6 +1,7 @@
 <?php
 $pageTitle = "Liên hệ";
 include 'includes/header.php';
+include 'includes/navbar.php';
 
 // Xử lý khi form được submit
 $showSuccess = false;
