@@ -169,7 +169,7 @@ $totalPages = ceil($totalRows / $perPage);
                                         <td>
                                             <div class="product-info">
                                                 <?php if (!empty($row['hinh_anh'])): ?>
-                                                    <img src="<?= htmlspecialchars($row['hinh_anh']) ?>" 
+                                                    <img src="../assets/img/products/<?= htmlspecialchars($row['hinh_anh']) ?>" 
                                                          class="product-thumb" 
                                                          alt="<?= htmlspecialchars($row['ten_san_pham']) ?>">
                                                 <?php endif; ?>

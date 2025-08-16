@@ -363,7 +363,7 @@ $items->data_seek(0); // Reset con trỏ kết quả
                                 <td>
                                     <div class="product-info">
                                         <?php if (!empty($item['hinh_anh'])): ?>
-                                            <img src="../uploads/<?= htmlspecialchars($item['hinh_anh']) ?>" 
+                                            <img src="../assets/img/products/<?= htmlspecialchars($item['hinh_anh']) ?>" 
                                                  alt="<?= htmlspecialchars($item['ten_san_pham']) ?>" 
                                                  class="product-image">
                                         <?php endif; ?>

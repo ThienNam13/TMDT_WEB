@@ -67,7 +67,7 @@ if (!$result) {
                         <tr>
                             <td>
                                 <?php if (!empty($row['hinh_anh'])): ?>
-                                    <img src="../<?php echo htmlspecialchars($row['hinh_anh']); ?>?v=<?php echo time(); ?>" 
+                                    <img src="../assets/img/products/<?php echo htmlspecialchars($row['hinh_anh']); ?>?v=<?php echo time(); ?>" 
                                          class="product-thumbnail"
                                          alt="<?php echo htmlspecialchars($row['ten_san_pham']); ?>">
                                 <?php else: ?>
