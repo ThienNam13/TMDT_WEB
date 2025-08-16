@@ -129,6 +129,7 @@
     margin: 0 3px;
     display: inline-flex;
     transition: all 0.2s ease;
+    cursor: pointer;
 }
 
 .btn-icon:hover {

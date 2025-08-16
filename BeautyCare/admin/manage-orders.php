@@ -1,6 +1,14 @@
 <?php
 include '../php/database.php';
 include 'header.php';
+// Auto update orders: "Đang giao" quá 7 ngày -> "Hoàn tất"
+// $conn->query("
+//     UPDATE orders 
+//     SET trang_thai = 'Hoàn tất' 
+//     WHERE trang_thai = 'Đang giao'
+//       AND thoi_gian_giao IS NOT NULL
+//       AND thoi_gian_giao < (NOW() - INTERVAL 7 DAY)
+// ");
 
 // Initialize variables
 $search = isset($_GET['search']) ? trim($_GET['search']) : '';
@@ -292,6 +300,7 @@ while ($row = $statuses_result->fetch_assoc()) {
                                                             title="Chuyển sang Đang giao">
                                                         <i class="fas fa-truck"></i>
                                                     </button>
+
                                                 <?php elseif ($row['status'] === 'Yêu cầu trả hàng'): ?>
                                                     <button class="btn-icon btn-update-status" 
                                                             data-id="<?= $row['id'] ?>" 
@@ -299,6 +308,13 @@ while ($row = $statuses_result->fetch_assoc()) {
                                                             data-reason="<?= htmlspecialchars($row['cancel_reason']) ?>"
                                                             title="Xử lý yêu cầu trả hàng">
                                                         <i class="fas fa-undo-alt"></i>
+                                                    </button>
+                                                
+                                                <?php elseif ($row['status'] === 'Đã hủy' && !empty($row['cancel_reason'])): ?>
+                                                    <button class="btn-icon btn-view-reason" 
+                                                            data-reason="<?= htmlspecialchars($row['cancel_reason']) ?>"
+                                                            title="Xem lý do hủy">
+                                                        <i class="fas fa-ban"></i>
                                                     </button>
                                                 <?php endif; ?>
 
@@ -424,6 +440,18 @@ document.querySelectorAll('.btn-update-status').forEach(btn => {
                 }
             });
         }
+    });
+});
+
+// Xem lý do hủy
+document.querySelectorAll('.btn-view-reason').forEach(btn => {
+    btn.addEventListener('click', function() {
+        Swal.fire({
+            title: 'Lý do hủy đơn',
+            html: `<p style="text-align:left;color:#333;">${this.dataset.reason}</p>`,
+            icon: 'info',
+            confirmButtonText: 'Đóng'
+        });
     });
 });
 
