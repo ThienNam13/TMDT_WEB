@@ -34,7 +34,7 @@
             <li><a href="manage-orders.php"><i class="fas fa-file-invoice-dollar"></i> Đơn hàng</a></li>
             <li><a href="manage-customers.php"></i> Khách hàng</a></li>
             <li><a href="manage-reports.php"><i class="fas fa-chart-line"></i> Báo cáo</a></li>
-            <li><a href="logs.php"><i class="fas fa-cog"></i> Lịch sử hệ thống</a></li>
+            <li><a href="review-management.php"><i class="fas fa-cog"></i> Phản Hồi Ý Kiến Khách Hàng</a></li>
         </ul>
     </div>
 </nav>

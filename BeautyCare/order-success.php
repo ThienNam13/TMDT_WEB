@@ -2,6 +2,7 @@
 include 'includes/header.php';
 include 'includes/navbar.php';
 include 'php/database.php';
+date_default_timezone_set('Asia/Ho_Chi_Minh');
 
 // Determine which order to show
 $orderId = null;
@@ -48,6 +49,42 @@ if ($orderId) {
         $order = $result->fetch_assoc();
     }
     $stmt->close();
+
+    if ($order) {
+        $timeDiff = time() - strtotime($order['thoi_gian_dat']);
+        // Update trạng thái nếu quá 30 phút
+        if ($order['trang_thai'] === 'Chờ xác nhận' && $timeDiff > 1800) {
+            $stmt = $conn->prepare("UPDATE orders SET trang_thai = 'Đang xử lý' WHERE id = ?");
+            $stmt->bind_param("i", $orderId);
+            $stmt->execute();
+            $stmt->close();
+
+            // Cập nhật lại từ DB để đồng bộ cả $timeDiff và $order
+            $stmt = $conn->prepare("SELECT trang_thai, thoi_gian_dat FROM orders WHERE id = ?");
+            $stmt->bind_param("i", $orderId);
+            $stmt->execute();
+            $stmt->bind_result($trang_thai_moi, $thoi_gian_dat_moi);
+            if ($stmt->fetch()) {
+                $order['trang_thai'] = $trang_thai_moi;
+                $order['thoi_gian_dat'] = $thoi_gian_dat_moi;
+                $timeDiff = time() - strtotime($thoi_gian_dat_moi); // tính lại
+            }
+            $stmt->close();
+        }
+    }
+    // Hàm hiển thị badge màu
+    function getStatusBadge($status) {
+        $colors = [
+            'Chờ xác nhận' => '#ff9800',
+            'Đang xử lý'   => '#f8d01fff',
+            'Đang giao'    => '#87d5ffff',
+            'Hoàn tất'   => '#4caf50',
+            'Đã hủy'       => '#f8655bff',
+            'Yêu cầu trả hàng' => '#f2a711ff',
+        ];
+        $color = $colors[$status] ?? '#607d8b';
+        return '<span style="padding:2px 4px;border-radius:4px;background:'.$color.';color:#fff;font-weight:bold;">'.$status.'</span>';
+    }
 
     if ($order) {
         // Load items with exact quantities and prices from order_items table
@@ -110,9 +147,23 @@ if (!empty($orderItems)) {
                 <strong>Mã đơn:</strong><br>
                 <?php echo htmlspecialchars($order['ma_don'] ?: ('#' . $order['id'])); ?>
             </div>
-            <div class="box">
+            <div class="box"> 
                 <strong>Trạng thái:</strong><br>
-                <?php echo htmlspecialchars($order['trang_thai']); ?>
+                <?= getStatusBadge($order['trang_thai']); ?> 
+                <?php if ($order['trang_thai'] === 'Chờ xác nhận' && $timeDiff <= 1800): ?> <br>
+                    <button id="btnCancelOrder" class="btn-primary" data-id="<?= $order['id']; ?>" style="margin-top:6px;">
+                        Hủy đơn hàng
+                    </button>
+                <?php endif; ?>
+                <?php if ($order['trang_thai'] === 'Đang giao'): ?>
+                    <br>
+                    <button id="btnCompleteOrder" class="btn-primary" data-id="<?= $order['id']; ?>" style="margin-top:6px;">
+                        Đã giao thành công
+                    </button>
+                    <button id="btnReturnOrder" class="btn-primary" data-id="<?= $order['id']; ?>" style="margin-top:6px;">
+                        Yêu cầu Trả hàng/Hoàn tiền
+                    </button>
+                <?php endif; ?>
             </div>
             <div class="box">
                 <strong>Thời gian đặt:</strong><br>
@@ -187,6 +238,113 @@ if (!empty($orderItems)) {
     <?php endif; ?>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+document.getElementById('btnCancelOrder')?.addEventListener('click', function () {
+    const orderId = this.dataset.id;
+
+    Swal.fire({
+        title: 'Hủy đơn hàng',
+        input: 'textarea',
+        inputLabel: 'Lý do hủy',
+        inputPlaceholder: 'Nhập lý do bạn muốn hủy...',
+        showCancelButton: true,
+        confirmButtonText: 'Xác nhận hủy',
+        cancelButtonText: 'Đóng',
+        inputValidator: (value) => {
+            if (!value) return 'Vui lòng nhập lý do';
+        }
+    }).then(result => {
+        if (result.isConfirmed) {
+            Swal.fire({
+                title: 'Đang xử lý...',
+                didOpen: () => Swal.showLoading(),
+                allowOutsideClick: false
+            });
+
+            fetch('php/cancel_order.php', {
+                method: 'POST',
+                body: new URLSearchParams({
+                    order_id: orderId,
+                    reason: result.value
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                Swal.close();
+                Swal.fire(data.status === 'success' ? 'Thành công' : 'Lỗi', data.message, data.status);
+                if (data.status === 'success') {
+                    setTimeout(() => location.reload(), 1500);
+                }
+            })
+            .catch(() => {
+                Swal.close();
+                Swal.fire('Lỗi', 'Không thể kết nối tới máy chủ', 'error');
+            });
+        }
+    });
+});
+// Hoàn tất đơn
+document.getElementById('btnCompleteOrder')?.addEventListener('click', function () {
+    const orderId = this.dataset.id;
+    Swal.fire({
+        title: 'Xác nhận đã nhận hàng?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Xác nhận',
+        cancelButtonText: 'Đóng'
+    }).then(res => {
+        if (res.isConfirmed) {
+            Swal.fire({title: 'Đang xử lý...', didOpen: () => Swal.showLoading(), allowOutsideClick: false});
+            fetch('php/update_order_status.php', {
+                method: 'POST',
+                body: new URLSearchParams({order_id: orderId, action: 'complete'})
+            })
+            .then(r => r.json())
+            .then(data => {
+                Swal.close();
+                Swal.fire(data.status === 'success' ? 'Thành công' : 'Lỗi', data.message, data.status);
+                if (data.status === 'success') setTimeout(() => location.reload(), 1500);
+            });
+        }
+    });
+});
+
+// Yêu cầu trả hàng
+document.getElementById('btnReturnOrder')?.addEventListener('click', function () {
+    const orderId = this.dataset.id;
+    Swal.fire({
+        title: 'Yêu cầu Trả hàng/Hoàn tiền',
+        html: `<textarea id="returnReason" class="swal2-textarea" placeholder="Nhập lý do..."></textarea>
+               <p style="font-size:13px;margin-top:8px;">Liên hệ Admin: 0123 456 789</p>`,
+        focusConfirm: false,
+        showCancelButton: true,
+        confirmButtonText: 'Gửi yêu cầu',
+        cancelButtonText: 'Đóng',
+        preConfirm: () => {
+            const reason = document.getElementById('returnReason').value.trim();
+            if (!reason) {
+                Swal.showValidationMessage('Vui lòng nhập lý do');
+                return false;
+            }
+            return reason;
+        }
+    }).then(res => {
+        if (res.isConfirmed) {
+            Swal.fire({title: 'Đang gửi yêu cầu...', didOpen: () => Swal.showLoading(), allowOutsideClick: false});
+            fetch('php/update_order_status.php', {
+                method: 'POST',
+                body: new URLSearchParams({order_id: orderId, action: 'return', reason: res.value})
+            })
+            .then(r => r.json())
+            .then(data => {
+                Swal.close();
+                Swal.fire(data.status === 'success' ? 'Thành công' : 'Lỗi', data.message, data.status);
+                if (data.status === 'success') setTimeout(() => location.reload(), 1500);
+            });
+        }
+    });
+});
+</script>
+
 <?php include 'includes/footer.php'; ?>
-
-

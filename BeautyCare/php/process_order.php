@@ -5,6 +5,7 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 header('Content-Type: application/json');
+date_default_timezone_set('Asia/Ho_Chi_Minh');
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
@@ -121,11 +122,12 @@ try {
     $orderCode = generateOrderCode($conn);
 
     $stmt = $conn->prepare(
-        'INSERT INTO orders (ma_don, user_id, ho_ten, sdt, dia_chi, phuong_xa, khu_vuc, tong_tien, ghi_chu, hinh_thuc_thanh_toan)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+        'INSERT INTO orders (ma_don, user_id, ho_ten, sdt, dia_chi, phuong_xa, khu_vuc, tong_tien, ghi_chu, hinh_thuc_thanh_toan, trang_thai)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
     );
+    $trang_thai = 'Chờ xác nhận';
     $stmt->bind_param(
-        'sisssssdds',
+        'sisssssddss',
         $orderCode,
         $userId,
         $hoTen,
@@ -135,7 +137,8 @@ try {
         $khuVuc,
         $grandTotal,
         $ghiChu,
-        $hinhThucThanhToan
+        $hinhThucThanhToan,
+        $trang_thai
     );
     $stmt->execute();
     $orderId = $stmt->insert_id;

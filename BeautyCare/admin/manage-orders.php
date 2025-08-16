@@ -22,6 +22,7 @@ $sql = "SELECT
             o.thoi_gian_dat AS order_date, 
             o.tong_tien AS total_amount, 
             o.trang_thai AS status,
+            o.cancel_reason,
             o.hinh_thuc_thanh_toan AS payment_method
         FROM orders o
         WHERE 1=1";
@@ -283,9 +284,24 @@ while ($row = $statuses_result->fetch_assoc()) {
                                                 <a href="order_detail.php?id=<?= $row['id'] ?>" class="btn-icon" title="Xem chi tiết">
                                                     <i class="fas fa-eye"></i>
                                                 </a>
-                                                <a href="edit_order.php?id=<?= $row['id'] ?>" class="btn-icon" title="Sửa">
-                                                    <i class="fas fa-edit"></i>
-                                                </a>
+
+                                                <?php if ($row['status'] === 'Đang xử lý'): ?>
+                                                    <button class="btn-icon btn-update-status" 
+                                                            data-id="<?= $row['id'] ?>" 
+                                                            data-action="processing"
+                                                            title="Chuyển sang Đang giao">
+                                                        <i class="fas fa-truck"></i>
+                                                    </button>
+                                                <?php elseif ($row['status'] === 'Yêu cầu trả hàng'): ?>
+                                                    <button class="btn-icon btn-update-status" 
+                                                            data-id="<?= $row['id'] ?>" 
+                                                            data-action="return" 
+                                                            data-reason="<?= htmlspecialchars($row['cancel_reason']) ?>"
+                                                            title="Xử lý yêu cầu trả hàng">
+                                                        <i class="fas fa-undo-alt"></i>
+                                                    </button>
+                                                <?php endif; ?>
+
                                                 <a href="delete_order.php?id=<?= $row['id'] ?>" class="btn-icon btn-delete" title="Xóa" onclick="return confirm('Bạn có chắc chắn muốn xóa đơn hàng này?')">
                                                     <i class="fas fa-trash"></i>
                                                 </a>
@@ -342,6 +358,7 @@ while ($row = $statuses_result->fetch_assoc()) {
     </section>
 </main>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     // Quick search functionality
     document.getElementById('quick-search-btn').addEventListener('click', function() {
@@ -367,6 +384,94 @@ while ($row = $statuses_result->fetch_assoc()) {
             }
         });
     });
+    // View reason
+document.querySelectorAll('.btn-update-status').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const orderId = this.dataset.id;
+        const actionType = this.dataset.action;
+
+        if (actionType === 'processing') {
+            Swal.fire({
+                title: 'Xác nhận',
+                text: 'Bạn có chắc muốn chuyển đơn hàng sang trạng thái "Đang giao"?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Chuyển ngay',
+                cancelButtonText: 'Hủy'
+            }).then(result => {
+                if (result.isConfirmed) {
+                    updateStatus(orderId, 'Đang giao');
+                }
+            });
+        }
+
+        if (actionType === 'return') {
+            const reason = this.dataset.reason || 'Không có lý do';
+            Swal.fire({
+                title: 'Yêu cầu trả hàng',
+                html: `<p style="text-align:left;">${reason.replace(/\n/g,'<br>')}</p>`,
+                icon: 'info',
+                showCancelButton: true,
+                showDenyButton: true,
+                confirmButtonText: 'Xác nhận yêu cầu',
+                denyButtonText: 'Từ chối yêu cầu',
+                cancelButtonText: 'Đóng'
+            }).then(result => {
+                if (result.isConfirmed) {
+                    updateStatus(orderId, 'Đã hủy');
+                } else if (result.isDenied) {
+                    updateStatus(orderId, 'Đang giao');
+                }
+            });
+        }
+    });
+});
+
+function updateStatus(orderId, newStatus, reason = '') {
+    fetch('update_order_status.php', {
+        method: 'POST',
+        body: new URLSearchParams({
+            order_id: orderId,
+            new_status: newStatus,
+            cancel_reason: reason
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        Swal.fire(data.status === 'success' ? 'Thành công' : 'Lỗi', data.message, data.status);
+        if (data.status === 'success') {
+            setTimeout(() => location.reload(), 1000);
+        }
+    })
+    .catch(() => {
+        Swal.fire('Lỗi', 'Không thể kết nối tới máy chủ', 'error');
+    });
+}
+
+// setInterval(() => {
+//     fetch('api_get_new_orders.php')
+//         .then(res => res.json())
+//         .then(data => {
+//             if (data.new_orders && data.new_orders.length > 0) {
+//                 // Cập nhật bảng đơn hàng
+//                 const tbody = document.querySelector('.orders-table tbody');
+//                 data.new_orders.forEach(order => {
+//                     const row = document.createElement('tr');
+//                     row.innerHTML = `
+//                         <td>${order.ma_don}</td>
+//                         <td><strong>${order.customer_name}</strong><br><small>${order.customer_phone}</small></td>
+//                         <td>${order.order_date}</td>
+//                         <td>${order.total_amount}₫</td>
+//                         <td>${order.payment_method}</td>
+//                         <td><span class="status-badge">${order.status}</span></td>
+//                         <td>...</td>
+//                     `;
+//                     tbody.prepend(row);
+//                 });
+//             }
+//         })
+//         .catch(err => console.error(err));
+// }, 5000);
 </script>
 </body>
 </html>

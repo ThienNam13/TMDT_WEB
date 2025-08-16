@@ -2,6 +2,7 @@
 include '../php/database.php';
 include 'header.php';
 
+// Lấy danh sách sản phẩm mới nhất
 $sql = "SELECT * FROM san_pham ORDER BY id DESC";
 $result = $conn->query($sql);
 
@@ -19,6 +20,23 @@ if (!$result) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="assets/css/dashboard.css">
     <link rel="stylesheet" href="assets/css/products.css">
+    <style>
+        .status-available {
+            color: green;
+            font-weight: bold;
+        }
+        .status-unavailable {
+            color: red;
+            font-weight: bold;
+        }
+        .product-thumbnail {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+    </style>
 </head>
 <body>
 
@@ -40,6 +58,7 @@ if (!$result) {
                         <th>Tên sản phẩm</th>
                         <th>Giá</th>
                         <th>Mô tả</th>
+                        <th>Trạng thái</th>
                         <th>Hành động</th>
                     </tr>
                 </thead>
@@ -48,7 +67,7 @@ if (!$result) {
                         <tr>
                             <td>
                                 <?php if (!empty($row['hinh_anh'])): ?>
-                                    <img src="<?php echo htmlspecialchars($row['hinh_anh']); ?>" 
+                                    <img src="../<?php echo htmlspecialchars($row['hinh_anh']); ?>?v=<?php echo time(); ?>" 
                                          class="product-thumbnail"
                                          alt="<?php echo htmlspecialchars($row['ten_san_pham']); ?>">
                                 <?php else: ?>
@@ -63,8 +82,18 @@ if (!$result) {
                                     <?php echo htmlspecialchars(substr($row['mo_ta'], 0, 100)); ?>...
                                 </div>
                             </td>
-                            <td class="product-price"><?php echo number_format($row['gia'], 0, ',', '.'); ?>₫</td>
-                            <td><?php echo htmlspecialchars($row['danh_muc'] ?? 'Chưa phân loại'); ?></td>
+                            <td class="product-price">
+                                <?php echo number_format($row['gia'], 0, ',', '.'); ?>₫
+                            </td>
+                            <td>
+                                <?php 
+                                if ((int)$row['is_available'] === 1) {
+                                    echo '<span class="status-available">Còn hàng</span>';
+                                } else {
+                                    echo '<span class="status-unavailable">Hết hàng</span>';
+                                }
+                                ?>
+                            </td>
                             <td class="action-buttons">
                                 <a href="edit_product.php?id=<?php echo $row['id']; ?>" 
                                    class="btn btn-sm btn-edit" title="Sửa">
