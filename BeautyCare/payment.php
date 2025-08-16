@@ -408,6 +408,7 @@ $hcmWards = [
                     </div>
                     <div class="summary-row">
                         <span>Phí vận chuyển:</span>
+                        <p style="font-size: 0.85rem; color:#777;">*Phí vận chuyển áp dụng toàn TP.HCM</p>
                         <span><?= number_format($shippingFee, 0, ',', '.') ?> VNĐ</span>
                     </div>
                     <div class="summary-row total">
@@ -428,7 +429,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('paymentForm');
     const messageDiv = document.getElementById('message');
 
-    // Chọn phương thức thanh toán (giữ nguyên logic cũ của bạn nếu đã có)
+    // Chọn phương thức thanh toán
     const paymentMethods = document.querySelectorAll('.payment-method');
     paymentMethods.forEach(method => {
         method.addEventListener('click', function() {
@@ -480,6 +481,12 @@ document.addEventListener('DOMContentLoaded', function() {
             isValid = false;
         }
 
+        const validWards = <?= json_encode($hcmWards) ?>;
+        if (!validWards.includes(phuongXa)) {
+            showFieldError('phuong_xa', 'Vui lòng chọn đúng phường/xã trong danh sách');
+            isValid = false;
+        }
+
         return isValid;
     }
 
@@ -523,7 +530,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             Swal.fire({
                                 icon: data.status === 'success' ? 'success' : 'error',
                                 title: data.status === 'success' ? 'Đặt hàng thành công' : 'Lỗi',
-                                text: data.message,
+                                html: `<p>${data.message}</p>`,
                                 timer: data.status === 'success' ? 2000 : undefined,
                                 showConfirmButton: data.status !== 'success'
                             }).then(() => {
@@ -531,6 +538,10 @@ document.addEventListener('DOMContentLoaded', function() {
                                     window.location.href = data.redirect || 'order-success.php';
                                 }
                             });
+                            if (data.status !== 'success') {
+                                submitBtn.disabled = false;
+                                submitBtn.textContent = 'Đặt hàng';
+                            }
                         })
                         .catch(() => {
                             Swal.close();

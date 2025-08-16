@@ -2,12 +2,6 @@
 include '../php/database.php';
 include 'header.php';
 
-// Kiểm tra quyền truy cập nếu cần
-// if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] != 'admin') {
-//     header("Location: login.php");
-//     exit();
-// }
-
 // Xử lý ID
 if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
     header("Location: manage-inventory.php?error=invalid_id");
@@ -26,6 +20,7 @@ if ($result->num_rows === 0) {
     exit();
 }
 $current = $result->fetch_assoc();
+$san_pham_id = $current['san_pham_id'];
 
 // Xử lý form cập nhật
 $error = '';
@@ -41,7 +36,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         $stmt = $conn->prepare("UPDATE kho_hang SET vi_tri_kho = ?, so_luong_ton = ? WHERE id = ?");
         $stmt->bind_param("sii", $vi_tri_kho, $so_luong_ton, $id);
-        
+        // sau khi insert/update kho
+        if ($so_luong_ton <= 0) {
+            $conn->query("UPDATE san_pham SET is_available = 0 WHERE id = $san_pham_id");
+        } else {
+            $conn->query("UPDATE san_pham SET is_available = 1 WHERE id = $san_pham_id");
+        }
+
         if ($stmt->execute()) {
             header("Location: manage-inventory.php?success=1");
             exit();

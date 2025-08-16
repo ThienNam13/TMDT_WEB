@@ -83,13 +83,14 @@ if (empty($items)) {
     exit;
 }
 
-// Lấy giá sản phẩm và kiểm tra
+// Lấy giá sản phẩm + kiểm tra tồn kho
 $total = 0.0;
 $detailedItems = [];
 foreach ($items as $it) {
     $pid = $it['id'];
     $qty = $it['quantity'];
 
+    // Lấy thông tin sản phẩm
     $stmt = $conn->prepare('SELECT id, ten_san_pham, gia, is_available FROM san_pham WHERE id = ?');
     $stmt->bind_param('i', $pid);
     $stmt->execute();
@@ -99,6 +100,20 @@ foreach ($items as $it) {
 
     if (!$prod || (int)$prod['is_available'] !== 1) {
         echo json_encode(['status' => 'error', 'message' => 'Sản phẩm không khả dụng (ID: ' . $pid . ')']);
+        exit;
+    }
+
+    // Lấy tồn kho
+    $stmt = $conn->prepare('SELECT so_luong_ton FROM kho_hang WHERE san_pham_id = ? LIMIT 1');
+    $stmt->bind_param('i', $pid);
+    $stmt->execute();
+    $stockRes = $stmt->get_result();
+    $stockRow = $stockRes->fetch_assoc();
+    $stmt->close();
+
+    $stock = $stockRow ? (int)$stockRow['so_luong_ton'] : 0;
+    if ($qty > $stock) {
+        echo json_encode(['status' => 'error', 'message' => "Sản phẩm {$prod['ten_san_pham']} chỉ còn {$stock} cái trong kho"]);
         exit;
     }
 
@@ -148,6 +163,14 @@ try {
     $stmt = $conn->prepare('INSERT INTO order_items (order_id, san_pham_id, so_luong, don_gia) VALUES (?, ?, ?, ?)');
     foreach ($detailedItems as $di) {
         $stmt->bind_param('iiid', $orderId, $di['san_pham_id'], $di['so_luong'], $di['don_gia']);
+        $stmt->execute();
+    }
+    $stmt->close();
+
+    // Cập nhật tồn kho sau khi thêm order_items
+    $stmt = $conn->prepare('UPDATE kho_hang SET so_luong_ton = so_luong_ton - ? WHERE san_pham_id = ?');
+    foreach ($detailedItems as $di) {
+        $stmt->bind_param('ii', $di['so_luong'], $di['san_pham_id']);
         $stmt->execute();
     }
     $stmt->close();
