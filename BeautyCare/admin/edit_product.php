@@ -115,15 +115,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 </head>
 <body>
 
-<div class="products-container">
-    <div class="products-header">
-        <h2><i class="fas fa-edit"></i> Chỉnh sửa sản phẩm</h2>
-        <div class="action-buttons">
-            <a href="manage-products.php" class="btn btn-secondary">
-                <i class="fas fa-arrow-left"></i> Quay lại
-            </a>
-        </div>
-    </div>
+
 
     <div class="form-wrapper">
         <form method="POST" enctype="multipart/form-data">
