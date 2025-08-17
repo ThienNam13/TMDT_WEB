@@ -46,7 +46,7 @@ if (!isset($_SESSION['admin_id'])) {
             <li><a href="manage-orders.php" class="<?= basename($_SERVER['PHP_SELF']) == 'manage-orders.php' ? 'active' : '' ?>"><i class="fas fa-file-invoice-dollar"></i> Đơn hàng</a></li>
             <li><a href="manage-customers.php" class="<?= basename($_SERVER['PHP_SELF']) == 'manage-customers.php' ? 'active' : '' ?>"><i class="fas fa-users"></i> Khách hàng</a></li>
             <li><a href="manage-reports.php" class="<?= basename($_SERVER['PHP_SELF']) == 'manage-reports.php' ? 'active' : '' ?>"><i class="fas fa-chart-line"></i> Báo cáo</a></li>
-            <li><a href="logs.php" class="<?= basename($_SERVER['PHP_SELF']) == 'logs.php' ? 'active' : '' ?>"><i class="fas fa-cog"></i> Lịch sử hệ thống</a></li>
+            <li><a href="review-management.php" class="<?= basename($_SERVER['PHP_SELF']) == 'review-management.php' ? 'active' : '' ?>"><i class="fas fa-cog"></i> Phản Hồi Ý Kiến Khách Hàng </a></li>
         </ul>
     </div>
 </nav>

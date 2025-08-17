@@ -1,14 +1,13 @@
 <?php
-$servername = "localhost";
+$servername = "127.0.0.1";
 $username = "root";
 $password = "";
 $dbname = "myphamdb";
+$port = 3307;
 
-// Kết nối
-$conn = new mysqli($servername, $username, $password, $dbname);
+$conn = new mysqli($servername, $username, $password, $dbname, $port);
 $conn->query("SET time_zone = '+07:00'");
 
-// Kiểm tra kết nối
 if ($conn->connect_error) {
     die("Kết nối thất bại: " . $conn->connect_error);
 }

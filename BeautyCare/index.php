@@ -1,8 +1,155 @@
 <?php
-include 'php/database.php'; // Kết nối CSDL
+include 'php/database.php';
+include 'includes/header.php';
+include 'includes/navbar.php';
+
+// --- Lấy thông tin khuyến mãi từ CSDL ---
+$currentDateTime = date('Y-m-d H:i:s');
+$sqlPromo = "SELECT * FROM khuyen_mai 
+             WHERE trang_thai = 1 
+             AND ngay_bat_dau <= '$currentDateTime' 
+             AND ngay_ket_thuc >= '$currentDateTime' 
+             ORDER BY id DESC LIMIT 1";
+$promoData = $conn->query($sqlPromo)->fetch_assoc();
+
+// --- Kiểm tra khuyến mãi ---
+$isPromoActive = false;
+$promoMessage = "";
+$promoProducts = [];
+$nextPromoTime = null;
+
+if ($promoData) {
+    $dayOfWeek = date('N'); // 1=Thứ 2, 7=CN
+    $hour = date('H');
+    
+    // Kiểm tra nếu là khuyến mãi giờ vàng cuối tuần
+    if ($promoData['id'] == 1) {
+        if (in_array($dayOfWeek, [5,6,7])) {
+            $isPromoActive = ($hour >= 19 && $hour <= 23);
+            $promoMessage = $isPromoActive 
+                ? "🔥 Giờ vàng khuyến mãi! Giảm ngay {$promoData['muc_giam_gia']}%" 
+                : "Khuyến mãi giờ vàng sắp diễn ra!";
+            
+            // Tính thời gian đến khuyến mãi tiếp theo
+            if (!$isPromoActive) {
+                if ($dayOfWeek < 5) {
+                    $nextPromoDay = 5; // Thứ 6
+                } elseif ($dayOfWeek == 5 && $hour < 19) {
+                    $nextPromoDay = 5; // Cùng ngày nhưng chưa đến giờ
+                } else {
+                    $nextPromoDay = 5 + (7 - $dayOfWeek); // Thứ 6 tuần sau
+                }
+                $nextPromoTime = strtotime("next Friday 19:00:00");
+            }
+        }
+    } else {
+        // Xử lý các loại khuyến mãi khác
+        $isPromoActive = true;
+        $promoMessage = "🔥 {$promoData['ten_chuong_trinh']} - Giảm {$promoData['muc_giam_gia']}%";
+    }
+    
+    // Lấy sản phẩm khuyến mãi
+    if ($isPromoActive || $promoData['id'] == 1) {
+        $sqlProducts = "SELECT sp.* FROM san_pham sp
+                        JOIN san_pham_khuyen_mai spkm ON sp.id = spkm.san_pham_id
+                        WHERE spkm.khuyen_mai_id = {$promoData['id']}
+                        ORDER BY RAND() LIMIT 6";
+        
+        $result = $conn->query($sqlProducts);
+        if ($result && $result->num_rows > 0) {
+            while($row = $result->fetch_assoc()) {
+                $promoProducts[] = $row;
+            }
+        } else {
+            // Nếu không có sản phẩm được chọn riêng, lấy ngẫu nhiên
+            $sqlRandom = "SELECT * FROM san_pham ORDER BY RAND() LIMIT 6";
+            $resultRandom = $conn->query($sqlRandom);
+            while($row = $resultRandom->fetch_assoc()) {
+                $promoProducts[] = $row;
+            }
+        }
+    }
+}
+
+// Nếu không có khuyến mãi nào, kiểm tra khuyến mãi sắp tới
+if (!$promoData) {
+    $sqlNextPromo = "SELECT * FROM khuyen_mai 
+                    WHERE trang_thai = 1 
+                    AND ngay_bat_dau > '$currentDateTime'
+                    ORDER BY ngay_bat_dau ASC LIMIT 1";
+    $nextPromo = $conn->query($sqlNextPromo)->fetch_assoc();
+    
+    if ($nextPromo) {
+        $promoMessage = "Sắp diễn ra: {$nextPromo['ten_chuong_trinh']}";
+        $nextPromoTime = strtotime($nextPromo['ngay_bat_dau']);
+    }
+}
 ?>
-<?php include 'includes/header.php'; ?>
-<?php include 'includes/navbar.php'; ?>
+
+<!-- Slider Banner -->
+<div class="banner-slider swiper">
+    <!-- ... (giữ nguyên phần slider banner) ... -->
+</div>
+
+<!-- Thêm CSS khuyến mãi -->
+<link rel="stylesheet" href="assets/css/promo.css">
+
+<!-- Section khuyến mãi -->
+<?php if ($promoData || $nextPromoTime): ?>
+<section class="promo-section">
+    <h2><?php echo htmlspecialchars($promoMessage); ?></h2>
+    
+    <?php if (!empty($promoProducts)): ?>
+    <div class="promo-products">
+        <?php foreach($promoProducts as $sp): ?>
+            <div class="promo-product-card">
+                <img src="uploads/<?php echo htmlspecialchars($sp['hinh_anh']); ?>" alt="<?php echo htmlspecialchars($sp['ten_san_pham']); ?>">
+                <h3><?php echo htmlspecialchars($sp['ten_san_pham']); ?></h3>
+                
+                <?php if ($isPromoActive): ?>
+                    <?php $newPrice = $sp['gia'] * (1 - $promoData['muc_giam_gia']/100); ?>
+                    <p class="original-price"><?php echo number_format($sp['gia']); ?>đ</p>
+                    <p class="promo-price"><?php echo number_format($newPrice); ?>đ</p>
+                    <span class="badge">-<?php echo $promoData['muc_giam_gia']; ?>%</span>
+                <?php else: ?>
+                    <p class="promo-price"><?php echo number_format($sp['gia']); ?>đ</p>
+                    <span class="badge coming-soon-badge">Sắp giảm giá</span>
+                <?php endif; ?>
+            </div>
+        <?php endforeach; ?>
+    </div>
+    <?php endif; ?>
+
+    <?php if(!$isPromoActive && $nextPromoTime): ?>
+        <div id="countdown"></div>
+        <script>
+            // Countdown tới giờ khuyến mãi
+            var countDownDate = new Date(<?php echo $nextPromoTime*1000; ?>).getTime();
+            var x = setInterval(function() {
+                var now = new Date().getTime();
+                var distance = countDownDate - now;
+                
+                if (distance < 0) {
+                    clearInterval(x);
+                    document.getElementById("countdown").innerHTML = "🔥 Khuyến mãi đang diễn ra!";
+                    location.reload(); // Tải lại trang khi đến giờ khuyến mãi
+                } else {
+                    var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                    var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                    var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                    
+                    var countdownText = "⏰ Khuyến mãi bắt đầu sau: ";
+                    if (days > 0) countdownText += days + " ngày ";
+                    countdownText += hours + " giờ " + minutes + " phút " + seconds + " giây";
+                    
+                    document.getElementById("countdown").innerHTML = countdownText;
+                }
+            }, 1000);
+        </script>
+    <?php endif; ?>
+</section>
+<?php endif; ?>
 
 <?php if (isset($_SESSION['success'])): ?>
     <div class="alert success">
@@ -68,7 +215,7 @@ include 'php/database.php'; // Kết nối CSDL
                 echo '<img src="assets/img/products/'.$row['hinh_anh'].'" alt="'.$row['ten_san_pham'].'">';
                 echo '<h3>'.$row['ten_san_pham'].'</h3>';
                 echo '<p class="price">'.number_format($row['gia'], 0, ',', '.').' VND</p>';
-                echo '<a href="product-detail.php?id='.$row['id'].'" class="btn-primary">Xem chi tiết</a>';
+echo '<a href="product-detail.php?id='.$row['id'].'" class="btn-primary">Xem chi tiết</a>';
                 echo '</div>';
             }
         } else {

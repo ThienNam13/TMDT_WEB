@@ -50,9 +50,6 @@ $stats = [
         <div class="dashboard-header">
             <h2><i class="fas fa-users"></i> Quản lý Khách hàng</h2>
             <div class="header-actions">
-                <a href="add_customers.php" class="btn-add" id="addCustomerBtn">
-                   <i class="fas fa-user-plus"></i> Thêm tài khoản khách hàng
-                </a>
                 <a href="export_customers.php" class="btn-export">
                     <i class="fas fa-file-export"></i> Xuất Excel
                 </a>
