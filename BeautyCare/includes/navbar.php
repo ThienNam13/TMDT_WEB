@@ -1,6 +1,4 @@
 <?php
-// để navbar hoạt động độc lập hoặc bạn có thể chắc chắn nó
-// đã được định nghĩa trong header.php
 $base_url = '../BeautyCare/';
 ?>
 <nav class="main-navbar">
@@ -13,6 +11,9 @@ $base_url = '../BeautyCare/';
                 <li><a href="<?php echo $base_url; ?>products.php?category=Trang điểm">Trang điểm</a></li>
                 <li><a href="<?php echo $base_url; ?>products.php?category=Chăm sóc tóc">Chăm sóc tóc</a></li>
                 <li><a href="<?php echo $base_url; ?>products.php?category=Mặt nạ">Mặt nạ</a></li>
+                <li><a href="<?php echo $base_url; ?>products.php?category=Chăm sóc cơ thể">Chăm sóc cơ thể</a></li>
+                <li><a href="<?php echo $base_url; ?>products.php?category=Nước hoa">Nước hoa</a></li>
+                <li><a href="<?php echo $base_url; ?>products.php?category=Dụng cụ làm đẹp">Dụng cụ làm đẹp</a></li>
             </ul>
         </li>
         <li><a href="<?php echo $base_url; ?>about.php">Giới thiệu</a></li>
