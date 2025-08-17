@@ -36,8 +36,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['product_id'])) {
 if (isset($_POST['update_qty'])) {
     $product_id = intval($_POST['product_id']);
     $new_qty = max(1, intval($_POST['quantity']));
+    $so_luong_ton = $so_luong_ton ?? 0;
+    // Lấy số lượng tồn kho từ DB
+    $sql = "SELECT so_luong_ton FROM kho_hang WHERE san_pham_id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $product_id);
+    $stmt->execute();
+    $stmt->bind_result($so_luong_ton);
+    $stmt->fetch();
+    $stmt->close();
+
     if (isset($_SESSION['cart'][$product_id])) {
-        $_SESSION['cart'][$product_id]['qty'] = $new_qty;
+        if ($new_qty > $so_luong_ton) {
+            $_SESSION['cart'][$product_id]['qty'] = $so_luong_ton; // Giới hạn lại
+            $ten_san_pham = $_SESSION['cart'][$product_id]['ten_san_pham'] ?? 'Sản phẩm';
+            $notice = "Sản phẩm {$ten_san_pham} chỉ còn {$so_luong_ton} cái trong kho, số lượng đã được điều chỉnh.";
+        } else {
+            $_SESSION['cart'][$product_id]['qty'] = $new_qty;
+        }
     }
 }
 
@@ -65,11 +81,30 @@ if (isset($_GET['remove'])) {
             </tr>
         </thead>
         <tbody>
+        <?php if (!empty($notice)): ?>
+        <div style="color:red; font-size: 0.9rem; margin-bottom:10px; text-align:center;">
+            <?= htmlspecialchars($notice) ?>
+        </div>
+        <?php endif; ?>
         <?php
         $tong_tien = 0;
+        $cart_valid = true; // flag để check giỏ có hợp lệ không
         foreach ($_SESSION['cart'] as $item):
+            // Lấy số lượng tồn kho từ DB
+            $sql = "SELECT so_luong_ton FROM kho_hang WHERE san_pham_id = ?";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("i", $item['id']);
+            $stmt->execute();
+            $stmt->bind_result($so_luong_ton);
+            $stmt->fetch();
+            $stmt->close();
             $thanh_tien = $item['gia'] * $item['qty'];
             $tong_tien += $thanh_tien;
+
+            // Nếu số lượng đặt lớn hơn tồn kho -> giỏ không hợp lệ
+            if ($item['qty'] > $so_luong_ton || $so_luong_ton == 0) {
+                $cart_valid = false;
+            }
         ?>
         <tr style="text-align:center; border-bottom:1px solid #ddd;">
             <td>
@@ -79,12 +114,24 @@ if (isset($_GET['remove'])) {
                 <a href="product-detail.php?id=<?php echo $item['id']; ?>" style="color:#6a4c93; font-weight:500;">
                     <?php echo htmlspecialchars($item['ten_san_pham']); ?>
                 </a>
+                <br>
+                <small style="color:#888;">Còn lại: <?php echo $so_luong_ton; ?> sản phẩm</small>
+                <?php if ($item['qty'] > $so_luong_ton): ?>
+                    <br><span style="color:red; font-size:0.9rem;">⚠ Số lượng vượt quá tồn kho!</span>
+                <?php elseif ($so_luong_ton == 0): ?>
+                    <br><span style="color:red; font-size:0.9rem;">⚠ Hết hàng</span>
+                <?php endif; ?>
             </td>
             <td><?php echo number_format($item['gia'], 0, ',', '.'); ?> VND</td>
             <td>
                 <form method="POST" style="display:inline-block;">
                     <input type="hidden" name="product_id" value="<?php echo $item['id']; ?>">
-                    <input type="number" name="quantity" value="<?php echo $item['qty']; ?>" min="1" style="width:60px; padding:4px;">
+                    <input type="number" 
+                        name="quantity" 
+                        value="<?php echo $item['qty']; ?>" 
+                        min="1" 
+                        max="<?php echo $so_luong_ton; ?>" 
+                        style="width:60px; padding:4px;">
                     <button type="submit" name="update_qty" class="btn-primary" style="border:none; cursor:pointer;">Cập nhật</button>
                 </form>
             </td>
@@ -103,7 +150,12 @@ if (isset($_GET['remove'])) {
 
     <div style="margin-top:20px; text-align:center;">
         <a href="index.php" class="btn-primary">Tiếp tục mua sắm</a>
-        <a href="payment.php" class="btn-primary" style="background:#b5838d;">Thanh toán</a>
+        <?php if ($cart_valid): ?>
+            <a href="payment.php" class="btn-primary">Thanh toán</a>
+        <?php else: ?>
+            <button class="btn-primary" style="background:gray; cursor:not-allowed;" disabled>Không thể thanh toán</button>
+            <p style="color:red; margin-top:5px;">⚠ Vui lòng điều chỉnh số lượng sản phẩm theo tồn kho trước khi thanh toán.</p>
+        <?php endif; ?>
     </div>
 
     <?php else: ?>
@@ -112,3 +164,36 @@ if (isset($_GET['remove'])) {
 </div>
 
 <?php include 'includes/footer.php'; ?>
+<script>
+document.querySelectorAll('input[name="quantity"]').forEach(input => {
+    function checkQuantity() {
+        const max = parseInt(this.max);
+        let current = parseInt(this.value);
+
+        if (isNaN(current) || current < 1) {
+            this.value = 1; // tránh nhập số âm hoặc null
+            return;
+        }
+
+        if (current >= max) {
+            // nếu vượt quá hoặc bằng tồn kho thì cảnh báo
+            if (current > max) this.value = max;
+            Swal.fire({
+                icon: 'warning',
+                title: 'Số lượng không đủ',
+                text: 'Chỉ còn ' + max + ' sản phẩm trong kho',
+                confirmButtonText: 'OK'
+            });
+        }
+    }
+
+    // Gõ trực tiếp
+    input.addEventListener('input', checkQuantity);
+    // Khi tăng giảm bằng nút spinner
+    input.addEventListener('click', checkQuantity);
+    // Khi rời khỏi input
+    input.addEventListener('change', checkQuantity);
+    // Khi bấm phím lên/xuống
+    input.addEventListener('keyup', checkQuantity);
+});
+</script>

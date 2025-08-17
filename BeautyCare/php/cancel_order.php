@@ -43,6 +43,21 @@ $stmt->bind_param("si", $reason, $orderId);
 if ($stmt->execute()) {
     $stmt->close();
 
+    // Hoàn lại số lượng tồn kho
+    $sqlItems = "SELECT san_pham_id, so_luong FROM order_items WHERE order_id = ?";
+    $stmtItems = $conn->prepare($sqlItems);
+    $stmtItems->bind_param("i", $orderId);
+    $stmtItems->execute();
+    $resItems = $stmtItems->get_result();
+
+    while ($item = $resItems->fetch_assoc()) {
+        $updateStock = $conn->prepare("UPDATE kho_hang SET so_luong_ton = so_luong_ton + ? WHERE san_pham_id = ?");
+        $updateStock->bind_param("ii", $item['so_luong'], $item['san_pham_id']);
+        $updateStock->execute();
+        $updateStock->close();
+    }
+    $stmtItems->close();
+
     $extraMsg = '';
     if (in_array($order['hinh_thuc_thanh_toan'], ['Chuyển khoản', 'MOMO'])) {
         $extraMsg = ' Admin sẽ xử lý số tiền của bạn sớm nhất.';

@@ -408,6 +408,7 @@ $hcmWards = [
                     </div>
                     <div class="summary-row">
                         <span>Phí vận chuyển:</span>
+                        <p style="font-size: 0.85rem; color:#777;">*Phí vận chuyển áp dụng toàn TP.HCM</p>
                         <span><?= number_format($shippingFee, 0, ',', '.') ?> VNĐ</span>
                     </div>
                     <div class="summary-row total">
@@ -428,7 +429,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('paymentForm');
     const messageDiv = document.getElementById('message');
 
-    // Chọn phương thức thanh toán (giữ nguyên logic cũ của bạn nếu đã có)
+    // Chọn phương thức thanh toán
     const paymentMethods = document.querySelectorAll('.payment-method');
     paymentMethods.forEach(method => {
         method.addEventListener('click', function() {
@@ -448,6 +449,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function validateForm() {
         let isValid = true;
+        let firstInvalidField = null;
 
         document.querySelectorAll('.error-message').forEach(el => el.style.display = 'none');
         document.querySelectorAll('.form-group input, .form-group textarea, .form-group select')
@@ -456,32 +458,51 @@ document.addEventListener('DOMContentLoaded', function() {
         const hoTen = document.getElementById('ho_ten').value.trim();
         if (hoTen.length < 2) {
             showFieldError('ho_ten', 'Họ tên phải có ít nhất 2 ký tự');
+            if (!firstInvalidField) firstInvalidField = document.getElementById('ho_ten');
             isValid = false;
         } else if (!/^[a-zA-ZÀ-ỹ\s]+$/.test(hoTen)) {
             showFieldError('ho_ten', 'Họ tên chỉ được chứa chữ cái và khoảng trắng');
+            if (!firstInvalidField) firstInvalidField = document.getElementById('ho_ten');
             isValid = false;
         }
 
         const sdt = document.getElementById('sdt').value.trim();
         if (!/^[0-9]{10,11}$/.test(sdt)) {
             showFieldError('sdt', 'Số điện thoại phải có 10-11 chữ số');
+            if (!firstInvalidField) firstInvalidField = document.getElementById('sdt');
             isValid = false;
         }
 
         const diaChi = document.getElementById('dia_chi').value.trim();
         if (diaChi.length < 5) {
             showFieldError('dia_chi', 'Địa chỉ phải có ít nhất 5 ký tự');
+            if (!firstInvalidField) firstInvalidField = document.getElementById('dia_chi');
             isValid = false;
         }
 
         const phuongXa = document.getElementById('phuong_xa').value.trim();
         if (phuongXa === "") {
             showFieldError('phuong_xa', 'Vui lòng chọn phường/xã');
+            if (!firstInvalidField) firstInvalidField = document.getElementById('phuong_xa');
             isValid = false;
+        }
+
+        const validWards = <?= json_encode($hcmWards) ?>;
+        if (phuongXa && !validWards.includes(phuongXa)) {
+            showFieldError('phuong_xa', 'Vui lòng chọn đúng phường/xã trong danh sách');
+            if (!firstInvalidField) firstInvalidField = document.getElementById('phuong_xa');
+            isValid = false;
+        }
+
+        // 🔽 Nếu có lỗi thì cuộn đến input đầu tiên bị lỗi
+        if (!isValid && firstInvalidField) {
+            firstInvalidField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            firstInvalidField.focus();
         }
 
         return isValid;
     }
+
 
     function showMessage(message, type) {
         messageDiv.textContent = message;
@@ -523,7 +544,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             Swal.fire({
                                 icon: data.status === 'success' ? 'success' : 'error',
                                 title: data.status === 'success' ? 'Đặt hàng thành công' : 'Lỗi',
-                                text: data.message,
+                                html: `<p>${data.message}</p>`,
                                 timer: data.status === 'success' ? 2000 : undefined,
                                 showConfirmButton: data.status !== 'success'
                             }).then(() => {
@@ -531,6 +552,10 @@ document.addEventListener('DOMContentLoaded', function() {
                                     window.location.href = data.redirect || 'order-success.php';
                                 }
                             });
+                            if (data.status !== 'success') {
+                                submitBtn.disabled = false;
+                                submitBtn.textContent = 'Đặt hàng';
+                            }
                         })
                         .catch(() => {
                             Swal.close();

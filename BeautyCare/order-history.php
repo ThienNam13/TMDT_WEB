@@ -78,7 +78,7 @@ if (!empty($orderIdList)) {
 .history-container { max-width: 1100px; margin: 20px auto 40px; }
 .history-title { text-align: center; color: #6a4c93; margin: 20px 0; }
 .order-card { background: #fff; border: 1px solid #eee; border-radius: 8px; margin-bottom: 14px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-.order-header { display: grid; grid-template-columns: 1.2fr 1fr 1fr 1fr 140px; gap: 10px; padding: 12px 14px; align-items: center; background: #faf5ff; }
+.order-header { display: grid; grid-template-columns: 1.2fr 1fr 1fr 1fr 250px; gap: 10px; padding: 12px 14px; align-items: center; background: #faf5ff; }
 .order-header div { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .order-body { display: none; padding: 12px 14px; }
 .order-body table { width: 100%; border-collapse: collapse; }
