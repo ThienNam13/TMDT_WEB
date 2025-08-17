@@ -13,11 +13,15 @@ if ($product_id <= 0) {
 }
 
 // Chuẩn bị và thực thi câu lệnh SQL để lấy chi tiết sản phẩm
-$sql = "SELECT * FROM san_pham WHERE id = ? AND is_available = 1 LIMIT 1";
+$sql = "SELECT sp.*, k.so_luong_ton 
+        FROM san_pham sp
+        LEFT JOIN kho_hang k ON sp.id = k.san_pham_id
+        WHERE sp.id = ? AND sp.is_available = 1
+        LIMIT 1";
 $stmt = $conn->prepare($sql);
 
 if ($stmt === false) {
-    die("Lỗi chuẩn bị câu lệnh SQL sản phẩm: " . $conn->error);
+    die("Lỗi không tìm thấy sản phẩm: " . $conn->error);
 }
 
 $stmt->bind_param("i", $product_id);
@@ -154,9 +158,30 @@ button,
             <!-- Form AJAX -->
             <form id="add-to-cart-form" onsubmit="return false;">
                 <input type="hidden" name="product_id" value="<?php echo $product_id; ?>">
+                <?php $stock = (int)($product['so_luong_ton'] ?? 0); ?>
                 <label>Số lượng:</label>
-                <input type="number" name="quantity" value="1" min="1" style="width:60px;">
-                <button type="button" class="btn-primary" onclick="addToCart()">Thêm vào giỏ hàng</button>
+                <input
+                  type="number"
+                  id="quantity-input"
+                  name="quantity"
+                  value="1"
+                  min="1"
+                  <?php if ($stock > 0): ?>
+                    max="<?= $stock ?>"
+                  <?php else: ?>
+                    disabled
+                  <?php endif; ?>
+                  style="width:60px;"
+                >
+                <small id="qty-hint" style="display:block;margin-top:6px;color:#777;">
+                  <?= $stock > 0 ? "Còn $stock sản phẩm." : "Sản phẩm đã hết hàng." ?>
+                </small>
+
+                <?php if ($stock > 0): ?>
+                  <button type="button" class="btn-primary" onclick="addToCart()">Thêm vào giỏ hàng</button>
+                <?php else: ?>
+                  <p style="color:red; font-weight:bold;">Sản phẩm đã hết hàng</p>
+                <?php endif; ?>
             </form>
             <div id="cart-message"></div>
         </div>
@@ -197,34 +222,76 @@ function addToCart() {
     Swal.fire({
         title: 'Đang xử lý...',
         allowOutsideClick: false,
-        didOpen: () => {
-            Swal.showLoading();
-        }
+        didOpen: () => Swal.showLoading()
     });
 
-    fetch('cart.php', {
+    fetch('php/add_to_cart.php', {
         method: 'POST',
         body: formData
     })
-    .then(res => res.text())
-    .then(() => {
+    .then(res => res.json())
+    .then(data => {
         Swal.close();
-        Swal.fire({
-            icon: 'success',
-            title: 'Đã thêm vào giỏ hàng!',
-            showCancelButton: true,
-            confirmButtonText: 'Xem giỏ hàng',
-            cancelButtonText: 'Tiếp tục mua sắm'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                window.location.href = 'cart.php';
-            }
-        });
+        if (data.status === 'success') {
+            Swal.fire({
+                icon: 'success',
+                title: data.message,
+                showCancelButton: true,
+                confirmButtonText: 'Xem giỏ hàng',
+                cancelButtonText: 'Tiếp tục mua sắm'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = 'cart.php';
+                }
+            });
+        } else {
+            Swal.fire('Lỗi', data.message, 'error');
+        }
     })
     .catch(() => {
         Swal.close();
         Swal.fire('Lỗi', 'Không thể thêm vào giỏ hàng', 'error');
     });
+}
+
+// Kiểm tra số lượng nhập vào không vượt quá tồn kho
+const qtyInput = document.getElementById('quantity-input');
+const hint = document.getElementById('qty-hint');
+
+if (qtyInput) {
+  const max = parseInt(qtyInput.max, 10) || Infinity;
+  let warned = false;
+
+  function checkQuantity() {
+    let val = parseInt(qtyInput.value, 10);
+    if (isNaN(val) || val < 1) val = 1;
+
+    if (val >= max) {
+      if (val > max) val = max;              // kẹp lại nếu vượt
+      qtyInput.value = val;
+
+      // chỉ báo 1 lần cho tới khi người dùng giảm xuống
+      if (!warned && isFinite(max)) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Đạt số lượng tối đa',
+          text: 'Chỉ còn ' + max + ' sản phẩm trong kho',
+          confirmButtonText: 'OK'
+        });
+        warned = true;
+      }
+
+      if (hint) { hint.textContent = 'Tối đa ' + max + ' sản phẩm.'; hint.style.color = '#d9534f'; }
+    } else {
+      warned = false;
+      if (hint) { hint.textContent = 'Còn ' + max + ' sản phẩm.'; hint.style.color = '#777'; }
+    }
+  }
+
+  // Bắt nhiều tình huống thay đổi số
+  ['input','change','keyup','mouseup','wheel','keydown'].forEach(ev => {
+    qtyInput.addEventListener(ev, checkQuantity);
+  });
 }
 </script>
 
