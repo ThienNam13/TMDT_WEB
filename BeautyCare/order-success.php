@@ -3,6 +3,12 @@ include 'includes/header.php';
 include 'includes/navbar.php';
 include 'php/database.php';
 date_default_timezone_set('Asia/Ho_Chi_Minh');
+// Kiểm tra đăng nhập
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit;
+}
+$userId = (int) $_SESSION['user_id'];
 
 // Determine which order to show
 $orderId = null;
@@ -13,8 +19,8 @@ if (isset($_GET['order_id'])) {
 
 // If order code provided, resolve to id
 if (!$orderId && $orderCode) {
-    $stmt = $conn->prepare("SELECT id FROM orders WHERE ma_don = ?");
-    $stmt->bind_param("s", $orderCode);
+    $stmt = $conn->prepare("SELECT id FROM orders WHERE ma_don = ? AND user_id = ?");
+    $stmt->bind_param("si", $orderCode, $userId);
     $stmt->execute();
     $stmt->bind_result($resolvedId);
     if ($stmt->fetch()) {
@@ -41,8 +47,10 @@ $orderItems = [];
 
 if ($orderId) {
     // Load order
-    $stmt = $conn->prepare("SELECT id, ma_don, ho_ten, sdt, dia_chi, phuong_xa, khu_vuc, tong_tien, thoi_gian_dat, trang_thai, hinh_thuc_thanh_toan, ghi_chu FROM orders WHERE id = ?");
-    $stmt->bind_param("i", $orderId);
+    $stmt = $conn->prepare("SELECT id, ma_don, ho_ten, sdt, dia_chi, phuong_xa, khu_vuc, tong_tien, thoi_gian_dat, trang_thai, hinh_thuc_thanh_toan, ghi_chu 
+                        FROM orders 
+                        WHERE id = ? AND user_id = ?");
+    $stmt->bind_param("ii", $orderId, $userId);
     $stmt->execute();
     $result = $stmt->get_result();
     if ($result && $result->num_rows > 0) {
