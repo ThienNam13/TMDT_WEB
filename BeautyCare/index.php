@@ -264,4 +264,5 @@ setTimeout(() => {
     });
 }, 3000); // 3 giây
 </script>
+<?php include 'chatbot.html'; ?>
 <?php include 'includes/footer.php'; ?>
