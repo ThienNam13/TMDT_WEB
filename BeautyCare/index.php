@@ -86,11 +86,6 @@ if (!$promoData) {
 }
 ?>
 
-<!-- Slider Banner -->
-<div class="banner-slider swiper">
-    <!-- ... (giữ nguyên phần slider banner) ... -->
-</div>
-
 <!-- Thêm CSS khuyến mãi -->
 <link rel="stylesheet" href="assets/css/promo.css">
 
