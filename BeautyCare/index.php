@@ -25,8 +25,8 @@ include 'includes/navbar.php';
         <div class="swiper-slide">
             <img src="assets/img/banner3.png" alt="Mỹ phẩm cao cấp">
             <div class="banner-text">
-                <!-- <h2>Mỹ phẩm cao cấp</h2>
-                <p>Miễn phí ship toàn quốc</p>
+                <h2>Mỹ phẩm cao cấp</h2>
+                <!-- <p>Miễn phí ship toàn quốc</p>
                 <a href="products.php" class="btn-primary">Xem ngay</a> -->
             </div>
         </div>
@@ -264,5 +264,5 @@ setTimeout(() => {
     });
 }, 3000); // 3 giây
 </script>
-<?php include 'chatbot.html'; ?>
+
 <?php include 'includes/footer.php'; ?>
