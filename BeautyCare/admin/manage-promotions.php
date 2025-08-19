@@ -3,11 +3,6 @@
 include '../php/database.php';
 include 'header.php';
 
-// Kiểm tra quyền admin
-if($_SESSION['user_role'] !== 'admin') {
-    header('Location: dashboard.php');
-    exit;
-}
 
 // Xử lý thêm/sửa/xóa khuyến mãi
 if($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -127,7 +122,6 @@ if(isset($_GET['edit'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quản lý khuyến mãi - BeautyCare Admin</title>
-    <link rel="stylesheet" href="assets/css/dashboard.css">
     <link rel="stylesheet" href="assets/css/promo.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>

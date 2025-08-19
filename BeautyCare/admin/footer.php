@@ -15,11 +15,11 @@
         <div class="footer-col">
             <h3>Liên kết nhanh</h3>
             <ul class="footer-links">
-                <li><a href="#"><i class="fas fa-chevron-right"></i> Trang chủ</a></li>
-                <li><a href="#"><i class="fas fa-chevron-right"></i> Giới thiệu</a></li>
-                <li><a href="#"><i class="fas fa-chevron-right"></i> Sản phẩm</a></li>
+                <li><a href="../index.php"><i class="fas fa-chevron-right"></i> Trang chủ</a></li>
+                <li><a href="../about.php"><i class="fas fa-chevron-right"></i> Giới thiệu</a></li>
+                <li><a href="../products.php"><i class="fas fa-chevron-right"></i> Sản phẩm</a></li>
                 <li><a href="#"><i class="fas fa-chevron-right"></i> Khuyến mãi</a></li>
-                <li><a href="#"><i class="fas fa-chevron-right"></i> Liên hệ</a></li>
+                <li><a href="../contact.php"><i class="fas fa-chevron-right"></i> Liên hệ</a></li>
             </ul>
         </div>
         <div class="footer-col">

@@ -45,11 +45,6 @@ $reviewsResult = $conn->query($reviewsQuery);
             color: #333;
         }
         
-        .container {
-            max-width: 1200px;
-            margin: 15px auto;
-            padding: 15px;
-        }
         
         
         .review-card {
