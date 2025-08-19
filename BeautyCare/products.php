@@ -8,7 +8,8 @@ $category = isset($_GET['category']) ? $conn->real_escape_string($_GET['category
 $brands = isset($_GET['brand']) && is_array($_GET['brand']) ? $_GET['brand'] : [];
 // Định nghĩa biến tìm kiếm từ URL
 $search_term = isset($_GET['search']) ? $conn->real_escape_string($_GET['search']) : null;
-
+$price_min = isset($_GET['price_min']) ? (int)$_GET['price_min'] : null;
+$price_max = isset($_GET['price_max']) ? (int)$_GET['price_max'] : null;
 
 // Lấy mã danh mục từ tên danh mục
 $ma_danh_muc = null;
@@ -22,15 +23,20 @@ if ($category) {
 // Lấy danh sách thương hiệu có trong danh mục
 $brands_list = [];
 if ($ma_danh_muc) {
+    // Nếu có danh mục thì lọc brand theo danh mục
     $sql_brands = "SELECT DISTINCT thuong_hieu FROM san_pham WHERE ma_danh_muc = $ma_danh_muc AND is_available = 1";
-    $res_brands = $conn->query($sql_brands);
-    while ($row_b = $res_brands->fetch_assoc()) {
-        $brands_list[] = $row_b['thuong_hieu'];
-    }
+} else {
+    // Nếu không có danh mục thì lấy tất cả brand
+    $sql_brands = "SELECT DISTINCT thuong_hieu FROM san_pham WHERE is_available = 1";
+}
+$res_brands = $conn->query($sql_brands);
+while ($row_b = $res_brands->fetch_assoc()) {
+    $brands_list[] = $row_b['thuong_hieu'];
 }
 
 // Truy vấn sản phẩm
 $sql = "SELECT * FROM san_pham WHERE is_available = 1";
+
 if ($search_term) {
     $sql .= " AND ten_san_pham LIKE '%$search_term%'";
 }
@@ -38,11 +44,20 @@ if ($search_term) {
 if ($ma_danh_muc) {
     $sql .= " AND ma_danh_muc = $ma_danh_muc";
 }
+
 if (!empty($brands)) {
     $escaped_brands = array_map(function($b) use ($conn) {
         return "'" . $conn->real_escape_string($b) . "'";
     }, $brands);
     $sql .= " AND thuong_hieu IN (" . implode(',', $escaped_brands) . ")";
+}
+
+// --- Lọc giá ---
+if ($price_min !== null) {
+    $sql .= " AND gia >= $price_min";
+}
+if ($price_max !== null) {
+    $sql .= " AND gia <= $price_max";
 }
 $result = $conn->query($sql);
 ?>
@@ -136,6 +151,15 @@ $result = $conn->query($sql);
     padding: 8px 12px;
 }
 
+.price-filter {
+    display: flex;
+    justify-content: space-between;
+    gap: 5px;
+}
+.price-filter input {
+    flex: 1;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .products-page {
@@ -167,7 +191,42 @@ $result = $conn->query($sql);
                 }
                 ?>
             </div>
+            
+            <h3>Khoảng giá</h3>
+            <div class="price-filter" style="margin-bottom: 15px;">
+                <input type="number" name="price_min" placeholder="Từ" 
+                        value="<?php echo htmlspecialchars($price_min); ?>" 
+                        style="width: 45%; padding: 5px; margin-right:5%; border:1px solid #ddd; border-radius:4px;">
+                <input type="number" name="price_max" placeholder="Đến" 
+                        value="<?php echo htmlspecialchars($price_max); ?>" 
+                        style="width: 45%; padding: 5px; border:1px solid #ddd; border-radius:4px;">
+            </div>
 
+            <h3>Mức giá nhanh</h3>
+            <div class="quick-price" style="margin-bottom: 15px;">
+                <?php
+                $ranges = [
+                    '0-100000' => 'Dưới 100K',
+                    '100000-500000' => '100K - 500K',
+                    '500000-1000000' => '500K - 1 Triệu',
+                    '1000000-' => 'Trên 1 Triệu'
+                ];
+                foreach ($ranges as $value => $label) {
+                    $checked = '';
+                    if ($price_min !== null || $price_max !== null) {
+                        list($min, $max) = explode('-', $value);
+                        if (($min === '' || $price_min == (int)$min) && 
+                            ($max === '' || $price_max == (int)$max)) {
+                            $checked = 'checked';
+                        }
+                    }
+                    echo '<label style="display:block; margin:3px 0;">
+                            <input type="radio" name="quick_price" value="'.$value.'" '.$checked.'> '.$label.'
+                        </label>';
+                }
+                ?>
+            </div>
+            
             <button type="submit" class="btn-primary" style="width: 100%;">Lọc</button>
         </form>
     </aside>
@@ -193,7 +252,19 @@ $result = $conn->query($sql);
             ?>
         </div>
     </section>
-
 </div>
 
 <?php include 'includes/footer.php'; ?>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll('input[name="quick_price"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            const val = this.value.split("-");
+            const min = val[0] !== "" ? val[0] : "";
+            const max = val[1] !== "" ? val[1] : "";
+            document.querySelector('[name="price_min"]').value = min;
+            document.querySelector('[name="price_max"]').value = max;
+        });
+    });
+});
+</script>

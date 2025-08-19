@@ -15,7 +15,7 @@ include 'includes/navbar.php';
             </div>
         </div>
         <div class="swiper-slide">
-            <img src="assets/img/banner2.jpg" alt="Trang điểm tự nhiên">
+            <img src="assets/img/banner2.png" alt="Trang điểm tự nhiên">
             <div class="banner-text">
                 <h2>Trang điểm tự tin</h2>
                 <p>BST mới 2025 – Giảm 20%</p>

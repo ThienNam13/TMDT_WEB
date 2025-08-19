@@ -301,6 +301,14 @@ while ($row = $statuses_result->fetch_assoc()) {
                                                         <i class="fas fa-truck"></i>
                                                     </button>
 
+                                                <?php elseif ($row['status'] === 'Đang giao'): ?>
+                                                    <button class="btn-icon btn-update-status" 
+                                                            data-id="<?= $row['id'] ?>" 
+                                                            data-action="complete"
+                                                            title="Xác nhận Hoàn tất">
+                                                        <i class="fas fa-check"></i>
+                                                    </button>
+
                                                 <?php elseif ($row['status'] === 'Yêu cầu trả hàng'): ?>
                                                     <button class="btn-icon btn-update-status" 
                                                             data-id="<?= $row['id'] ?>" 
@@ -417,6 +425,21 @@ document.querySelectorAll('.btn-update-status').forEach(btn => {
             }).then(result => {
                 if (result.isConfirmed) {
                     updateStatus(orderId, 'Đang giao');
+                }
+            });
+        }
+
+        if (actionType === 'complete') {
+            Swal.fire({
+                title: 'Xác nhận',
+                text: 'Bạn có chắc muốn chuyển đơn hàng sang trạng thái "Hoàn tất"?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Xác nhận',
+                cancelButtonText: 'Hủy'
+            }).then(result => {
+                if (result.isConfirmed) {
+                    updateStatus(orderId, 'Hoàn tất');
                 }
             });
         }
