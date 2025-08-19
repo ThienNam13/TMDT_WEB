@@ -198,6 +198,6 @@
         <p>Nguyễn Thiên Nam - Đào Duy Cường - Lê Nguyễn Hải Nam - Đặng Hoàng Gia Tiên - Đặng Nguyễn Anh Thư</p>
     </div>
 </footer>
-
+<?php include 'chatbot.html'; ?>
 </body>
 </html>
