@@ -1,24 +1,36 @@
 <?php
+session_start();
 $pageTitle = "Liên hệ";
 include 'includes/header.php';
 include 'includes/navbar.php';
+include 'php\database.php'; // Thêm kết nối database
 
 // Xử lý khi form được submit
 $showSuccess = false;
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Xử lý dữ liệu form (gửi email, lưu database...)
     $name = $_POST['name'];
     $email = $_POST['email'];
     $message = $_POST['message'];
+    $userId = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
     
-    // Đánh dấu hiển thị thông báo thành công
-    $showSuccess = true;
-    
-    // Lưu vào session để tránh hiển thị lại khi refresh
-    $_SESSION['form_submitted'] = true;
+    try {
+        // Lưu vào database
+        $stmt = $conn->prepare("INSERT INTO lien_he (user_id, ho_ten, email, noi_dung, ngay_gui) 
+                               VALUES (?, ?, ?, ?, NOW())");
+        $stmt->execute([$userId, $name, $email, $message]);
+        
+        // Gửi email thông báo (code giả lập)
+        // mail('support@beautycare.com', 'Liên hệ mới từ ' . $name, $message, 'From: ' . $email);
+        
+        $showSuccess = true;
+        $_SESSION['form_submitted'] = true;
+    } catch (PDOException $e) {
+        $error = "Lỗi khi gửi liên hệ: " . $e->getMessage();
+    }
 }
 ?>
 
+<!-- Phần HTML giữ nguyên như file gốc -->
 <?php if ($showSuccess || (isset($_SESSION['form_submitted']) && $_SESSION['form_submitted'])): ?>
 <div class="success-message">
     <div class="success-content">
@@ -80,7 +92,7 @@ else:
         <div class="contact-form-section">
             <div class="form-card">
                 <h2><i class="fas fa-envelope"></i> Gửi tin nhắn cho chúng tôi</h2>
-                <form action="submit_contact.php" method="POST" class="contact-form">
+                <form action="submit-contact.php" method="POST" class="contact-form">
                     <div class="form-group">
                         <label for="name">Họ và tên:</label>
                         <input type="text" id="name" name="name" required>
@@ -311,4 +323,5 @@ else:
 }
 </style>
 
-<?php include 'includes/footer.php'; ?>
+<?php include 'includes/footer.php'; 
+?>

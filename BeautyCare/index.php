@@ -2,7 +2,42 @@
 include 'php/database.php';
 include 'includes/header.php';
 include 'includes/navbar.php';
+?>
+<!-- Slider Banner -->
+<div class="banner-slider swiper">
+    <div class="swiper-wrapper">
+        <div class="swiper-slide">
+            <img src="assets/img/banner1.png" alt="Khuyến mãi mùa hè">
+            <div class="banner-text">
+                <h2>Làn da rạng rỡ</h2>
+                <p>Giảm giá đến 30% cho dòng dưỡng da</p>
+                <a href="products.php?category=Dưỡng da" class="btn-primary">Mua ngay</a>
+            </div>
+        </div>
+        <div class="swiper-slide">
+            <img src="assets/img/banner2.png" alt="Trang điểm tự nhiên">
+            <div class="banner-text">
+                <h2>Trang điểm tự tin</h2>
+                <p>BST mới 2025 – Giảm 20%</p>
+                <a href="products.php?category=Trang điểm" class="btn-primary">Khám phá</a>
+            </div>
+        </div>
+        <div class="swiper-slide">
+            <img src="assets/img/banner3.png" alt="Mỹ phẩm cao cấp">
+            <div class="banner-text">
+                <h2>Mỹ phẩm cao cấp</h2>
+                <p>Miễn phí ship toàn quốc</p>
+                <a href="products.php" class="btn-primary">Xem ngay</a>
+            </div>
+        </div>
+    </div>
+    <!-- Navigation -->
+    <div class="swiper-pagination"></div>
+    <div class="swiper-button-prev"></div>
+    <div class="swiper-button-next"></div>
+</div>
 
+<?php
 // --- Lấy thông tin khuyến mãi từ CSDL ---
 $currentDateTime = date('Y-m-d H:i:s');
 $sqlPromo = "SELECT * FROM khuyen_mai 
@@ -24,7 +59,7 @@ if ($promoData) {
     
     // Kiểm tra nếu là khuyến mãi giờ vàng cuối tuần
     if ($promoData['id'] == 1) {
-        if (in_array($dayOfWeek, [5,6,7])) {
+        if (in_array($dayOfWeek, [6,7,8])) {
             $isPromoActive = ($hour >= 19 && $hour <= 23);
             $promoMessage = $isPromoActive 
                 ? "🔥 Giờ vàng khuyến mãi! Giảm ngay {$promoData['muc_giam_gia']}%" 
@@ -53,7 +88,7 @@ if ($promoData) {
         $sqlProducts = "SELECT sp.* FROM san_pham sp
                         JOIN san_pham_khuyen_mai spkm ON sp.id = spkm.san_pham_id
                         WHERE spkm.khuyen_mai_id = {$promoData['id']}
-                        ORDER BY RAND() LIMIT 6";
+                        ORDER BY RAND() LIMIT 8";
         
         $result = $conn->query($sqlProducts);
         if ($result && $result->num_rows > 0) {
@@ -152,50 +187,6 @@ if (!$promoData) {
     </div>
 <?php endif; ?>
 
-<!-- Slider Banner -->
-<div class="banner-slider swiper">
-    <div class="swiper-wrapper">
-        <div class="swiper-slide">
-            <img src="assets/img/banner1.png" alt="Khuyến mãi mùa hè">
-            <div class="banner-text">
-                <h2>Làn da rạng rỡ</h2>
-                <p>Giảm giá đến 30% cho dòng dưỡng da</p>
-                <a href="products.php?category=Dưỡng da" class="btn-primary">Mua ngay</a>
-            </div>
-        </div>
-        <div class="swiper-slide">
-            <img src="assets/img/banner2.jpg" alt="Trang điểm tự nhiên">
-            <div class="banner-text">
-                <h2>Trang điểm tự tin</h2>
-                <p>BST mới 2025 – Giảm 20%</p>
-                <a href="products.php?category=Trang điểm" class="btn-primary">Khám phá</a>
-            </div>
-        </div>
-        <div class="swiper-slide">
-            <img src="assets/img/banner3.png" alt="Mỹ phẩm cao cấp">
-            <div class="banner-text">
-                <h2>Mỹ phẩm cao cấp</h2>
-                <p>Miễn phí ship toàn quốc</p>
-                <a href="products.php" class="btn-primary">Xem ngay</a>
-            </div>
-        </div>
-    </div>
-    <!-- Navigation -->
-    <div class="swiper-pagination"></div>
-    <div class="swiper-button-prev"></div>
-    <div class="swiper-button-next"></div>
-</div>
-
-<!-- Danh mục nổi bật -->
-<section class="categories">
-    <h2 class="section-title">Danh mục nổi bật</h2>
-    <div class="category-grid">
-        <a href="products.php?category=Dưỡng da" class="category-card">Dưỡng da</a>
-        <a href="products.php?category=Trang điểm" class="category-card">Trang điểm</a>
-        <a href="products.php?category=Chăm sóc tóc" class="category-card">Chăm sóc tóc</a>
-        <a href="products.php?category=Mặt nạ" class="category-card">Mặt nạ</a>
-    </div>
-</section>
 
 <!-- Sản phẩm nổi bật -->
 <section class="featured-products">

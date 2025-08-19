@@ -1,12 +1,14 @@
 <?php
+session_start();
+
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit();
+}
+
 include 'includes/header.php';
 include 'includes/navbar.php';
 include 'php/database.php';
-
-if (!isset($_SESSION['user_id'])) {
-    header('Location: login.php');
-    exit;
-}
 
 $userId = (int) $_SESSION['user_id'];
 
@@ -25,7 +27,7 @@ $res = $stmt->get_result();
 $orders = $res->fetch_all(MYSQLI_ASSOC);
 $stmt->close();
 
-// ===== Lấy danh sách sản phẩm đã đánh giá theo từng đơn =====
+// ===== Lấy danh sách sản phẩm để đánh giá theo từng đơn =====
 $reviewedItems = [];
 $sql = "SELECT order_id, san_pham_id 
         FROM danh_gia 
@@ -101,8 +103,11 @@ if (!empty($orderIdList)) {
     <h2 class="history-title">Lịch sử đơn hàng</h2>
 
     <?php if (empty($orders)): ?>
-        <div class="order-card">
-            <div class="empty">Bạn chưa có đơn hàng nào. <a href="products.php" class="btn-primary">Mua sắm ngay</a></div>
+        <div class="empty-state">
+            <img src="assets/img/empty-cart.png" alt="Chưa có đơn hàng">
+            <h3>Bạn chưa có đơn hàng nào</h3>
+            <p>Bắt đầu hành trình mua sắm cùng BeautyCare ngay hôm nay!</p>
+            <a href="products.php" class="btn-primary">Khám phá sản phẩm</a>
         </div>
     <?php else: ?>
         <?php foreach ($orders as $order): ?>
@@ -145,10 +150,14 @@ if (!empty($orderIdList)) {
                                     <td><?php echo number_format((float)$item['don_gia'], 0, ',', '.'); ?> VND</td>
                                     <td><?php echo number_format($line, 0, ',', '.'); ?> VND</td>
                                     <td>
-                                        <?php if (!empty($reviewedItems[$oid][$pid])): ?>
-                                            <span class="reviewed-badge">✅ Đã đánh giá</span>
+                                        <?php if ($order['trang_thai'] !== 'Hoàn tất'): ?>
+                                            <span class="reviewed-badge" style="background:#999;">⛔ Chưa thể đánh giá</span>
                                         <?php else: ?>
-                                            <a class="review-btn" href="review.php?order_id=<?php echo $oid; ?>&id=<?php echo $pid; ?>">Đánh giá</a>
+                                            <?php if (!empty($reviewedItems[$oid][$pid])): ?>
+                                                <span class="reviewed-badge">✅ Đã đánh giá</span>
+                                            <?php else: ?>
+                                                <a class="review-btn" href="review.php?order_id=<?php echo $oid; ?>&id=<?php echo $pid; ?>">Đánh giá</a>
+                                            <?php endif; ?>
                                         <?php endif; ?>
                                     </td>
                                 </tr>

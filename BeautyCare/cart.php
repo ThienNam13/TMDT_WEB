@@ -66,8 +66,6 @@ if (isset($_GET['remove'])) {
 
 <div class="container" style="margin-top: 20px;">
     <h2 class="section-title">Giỏ hàng của bạn</h2>
-    <p style="text-align:center;">Hướng dẫn: Bạn có thể thay đổi số lượng hoặc xóa sản phẩm khỏi giỏ hàng.</p>
-
     <?php if (!empty($_SESSION['cart'])): ?>
     <table class="cart-table" style="width:100%; border-collapse: collapse; margin-top:20px;">
         <thead>
@@ -158,8 +156,15 @@ if (isset($_GET['remove'])) {
         <?php endif; ?>
     </div>
 
+    <?php elseif (empty($_SESSION['cart'])): ?>
+        <div class="empty-state">
+            <img src="assets/img/empty-cart.png" alt="Giỏ hàng trống">
+            <h3>Giỏ hàng của bạn đang trống</h3>
+            <p>Hãy thêm sản phẩm để bắt đầu mua sắm ngay!</p>
+            <a href="products.php" class="btn-primary">Mua sắm ngay</a>
+        </div>
     <?php else: ?>
-        <p style="text-align:center;">Giỏ hàng của bạn đang trống. <a href="index.php" style="color:#6a4c93;">Mua sắm ngay</a></p>
+        <!-- Bảng giỏ hàng -->
     <?php endif; ?>
 </div>
 

@@ -174,13 +174,13 @@
         <div class="footer-section">
             <h3>Kết nối với chúng tôi</h3>
             <div class="social-icons">
-                <a href="https://www.facebook.com/cuong.d.dao" target="_blank" rel="noopener">
+                <a href="https://www.facebook.com/share/1CAJq7h7M1/?mibextid=wwXIfr" target="_blank" rel="noopener">
                     <img src="https://upload.wikimedia.org/wikipedia/commons/1/1b/Facebook_icon.svg" alt="Facebook" style="height: 30px;">
                 </a>
-                <a href="https://www.instagram.com/08duycng06_/" target="_blank" rel="noopener">
+                <a href="https://www.instagram.com/beauty.care.vn/?igsh=YzdrdXF1OGE3YjZh&utm_source=qr" target="_blank" rel="noopener">
                     <img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png" alt="Instagram" style="height: 30px;">
                 </a>
-                <a href="https://www.youtube.com/@02_aoduycuong40" target="_blank" rel="noopener">
+                <a href="https://www.youtube.com/@beautycare-HCM" target="_blank" rel="noopener">
                     <img src="https://upload.wikimedia.org/wikipedia/commons/0/09/YouTube_full-color_icon_(2017).svg" alt="YouTube" style="height: 30px;">
                 </a>
             </div>
@@ -202,6 +202,8 @@
     
     <div class="footer-bottom">
         <p>&copy; <?php echo date('Y'); ?> BeautyCare. Tất cả quyền được bảo lưu.</p>
+        <p>Dự án được tạo bởi nhóm sinh viên Trường Đại học Giao thông vận tải Thành phố Hồ Chí Minh.</p>
+        <p>Nguyễn Thiên Nam - Đào Duy Cường - Lê Nguyễn Hải Nam - Đặng Hoàng Gia Tiên - Đặng Nguyễn Anh Thư</p>
     </div>
 </footer>
 
