@@ -244,9 +244,9 @@ while ($row = $statuses_result->fetch_assoc()) {
                 <button id="quick-search-btn"><i class="fas fa-search"></i></button>
             </div>
             <div class="action-buttons">
-                <a href="add_order.php" class="btn btn-primary">
+                <!-- <a href="add_order.php" class="btn btn-primary">
                     <i class="fas fa-plus"></i> Thêm đơn hàng
-                </a>
+                </a> -->
                 <a href="export-orders.php?<?= http_build_query($_GET) ?>" class="btn btn-secondary">
                     <i class="fas fa-file-export"></i> Xuất Excel
                 </a>
@@ -326,8 +326,6 @@ while ($row = $statuses_result->fetch_assoc()) {
                                                     </button>
                                                 <?php endif; ?>
 
-                                                <a href="delete_order.php?id=<?= $row['id'] ?>" class="btn-icon btn-delete" title="Xóa" onclick="return confirm('Bạn có chắc chắn muốn xóa đơn hàng này?')">
-                                                    <i class="fas fa-trash"></i>
                                                 </a>
                                             </div>
                                         </td>

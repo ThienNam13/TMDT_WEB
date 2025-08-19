@@ -12,19 +12,24 @@ if (!isset($_SESSION['cart'])) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['product_id'])) {
     $product_id = intval($_POST['product_id']);
     $quantity = max(1, intval($_POST['quantity']));
+    $promo_price = isset($_POST['promo_price']) ? floatval($_POST['promo_price']) : null;
 
     $sql = "SELECT id, ten_san_pham, gia, hinh_anh FROM san_pham WHERE id = $product_id AND is_available = 1";
     $result = $conn->query($sql);
 
     if ($result && $result->num_rows > 0) {
         $product = $result->fetch_assoc();
+
+        // Nếu có promo_price gửi kèm thì ưu tiên giá khuyến mãi
+        $final_price = ($promo_price && $promo_price > 0) ? $promo_price : $product['gia'];
+
         if (isset($_SESSION['cart'][$product_id])) {
             $_SESSION['cart'][$product_id]['qty'] += $quantity;
         } else {
             $_SESSION['cart'][$product_id] = [
                 'id' => $product['id'],
                 'ten_san_pham' => $product['ten_san_pham'],
-                'gia' => $product['gia'],
+                'gia' => $final_price,
                 'hinh_anh' => $product['hinh_anh'],
                 'qty' => $quantity
             ];

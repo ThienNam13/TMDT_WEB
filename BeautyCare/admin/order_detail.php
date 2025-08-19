@@ -396,9 +396,9 @@ $items->data_seek(0); // Reset con trỏ kết quả
                         <a href="manage-orders.php" class="btn btn-secondary">
                             <i class="fas fa-arrow-left"></i> Quay lại
                         </a>
-                        <a href="edit_order.php?id=<?= $order_id ?>" class="btn btn-primary">
+                        <!-- <a href="edit_order.php?id=<?= $order_id ?>" class="btn btn-primary">
                             <i class="fas fa-edit"></i> Chỉnh sửa
-                        </a>
+                        </a> -->
                         <?php if ($order['trang_thai'] != 'Đã hủy'): ?>
                             <a href="update_order_status.php?id=<?= $order_id ?>&status=Đã hủy" 
                                class="btn btn-danger" 

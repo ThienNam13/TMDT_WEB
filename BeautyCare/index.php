@@ -9,25 +9,25 @@ include 'includes/navbar.php';
         <div class="swiper-slide">
             <img src="assets/img/banner1.png" alt="Khuyến mãi mùa hè">
             <div class="banner-text">
-                <h2>Làn da rạng rỡ</h2>
-                <p>Giảm giá đến 30% cho dòng dưỡng da</p>
+                <!-- <h2>Làn da rạng rỡ</h2>
+                <p>Giảm giá đến 30% cho dòng dưỡng da</p> -->
                 <a href="products.php?category=Dưỡng da" class="btn-primary">Mua ngay</a>
             </div>
         </div>
         <div class="swiper-slide">
             <img src="assets/img/banner2.png" alt="Trang điểm tự nhiên">
             <div class="banner-text">
-                <h2>Trang điểm tự tin</h2>
+                <!-- <h2>Trang điểm tự tin</h2>
                 <p>BST mới 2025 – Giảm 20%</p>
-                <a href="products.php?category=Trang điểm" class="btn-primary">Khám phá</a>
+                <a href="products.php?category=Trang điểm" class="btn-primary">Khám phá</a> -->
             </div>
         </div>
         <div class="swiper-slide">
             <img src="assets/img/banner3.png" alt="Mỹ phẩm cao cấp">
             <div class="banner-text">
-                <h2>Mỹ phẩm cao cấp</h2>
+                <!-- <h2>Mỹ phẩm cao cấp</h2>
                 <p>Miễn phí ship toàn quốc</p>
-                <a href="products.php" class="btn-primary">Xem ngay</a>
+                <a href="products.php" class="btn-primary">Xem ngay</a> -->
             </div>
         </div>
     </div>
@@ -90,12 +90,20 @@ if ($promoData) {
         $promoMessage  = "🔥 {$promoData['ten_chuong_trinh']} - Giảm {$promoData['muc_giam_gia']}%";
     }
 
-    // Lấy sản phẩm khuyến mãi
+    // --- Reset session sản phẩm khuyến mãi mỗi đầu tuần ---
+    if (date('N') === '1') { // Thứ 2
+        if (!isset($_SESSION['promo_week']) || $_SESSION['promo_week'] != date('W')) {
+            unset($_SESSION['promo_products']);
+            $_SESSION['promo_week'] = date('W'); // Ghi lại số tuần hiện tại
+        }
+    }
+
+    // --- Lấy sản phẩm khuyến mãi ---
     if ($isPromoActive || (int)$promoData['id'] === 1) {
         $sqlProducts = "SELECT sp.* FROM san_pham sp
                         JOIN san_pham_khuyen_mai spkm ON sp.id = spkm.san_pham_id
                         WHERE spkm.khuyen_mai_id = {$promoData['id']}
-                        ORDER BY RAND() LIMIT 8";
+                        LIMIT 8";
         $result = $conn->query($sqlProducts);
 
         if ($result && $result->num_rows > 0) {
@@ -103,12 +111,13 @@ if ($promoData) {
                 $promoProducts[] = $row;
             }
         } else {
-            // fallback
-            $sqlRandom = "SELECT * FROM san_pham ORDER BY RAND() LIMIT 6";
-            $resultRandom = $conn->query($sqlRandom);
-            while ($row = $resultRandom->fetch_assoc()) {
-                $promoProducts[] = $row;
+            // Nếu không có sản phẩm khuyến mãi định sẵn, random 1 lần và lưu session
+            if (!isset($_SESSION['promo_products'])) {
+                $sqlRandom = "SELECT * FROM san_pham ORDER BY RAND() LIMIT 6";
+                $resultRandom = $conn->query($sqlRandom);
+                $_SESSION['promo_products'] = $resultRandom->fetch_all(MYSQLI_ASSOC);
             }
+            $promoProducts = $_SESSION['promo_products'];
         }
     }
 }
@@ -153,6 +162,22 @@ if (!$promoData) {
                     <p class="promo-price"><?php echo number_format($sp['gia']); ?>đ</p>
                     <span class="badge coming-soon-badge">Sắp giảm giá</span>
                 <?php endif; ?>
+                
+                <!-- Nút xem chi tiết -->
+                <form method="POST" action="cart.php">
+                    <input type="hidden" name="product_id" value="<?php echo $sp['id']; ?>">
+                    <input type="hidden" name="quantity" value="1">
+                    <?php if ($isPromoActive): ?>
+                        <input type="hidden" name="promo_price" value="<?php echo $newPrice; ?>">
+                    <?php endif; ?>
+                    <?php if ($isPromoActive): ?>
+                        <button type="submit" class="btn-primary">🛒 Thêm vào giỏ</button>
+                    <?php else: ?>
+                        <button type="button" class="btn-primary" disabled style="opacity:0.6; cursor:not-allowed;">
+                            ⏳ Chưa đến giờ khuyến mãi
+                        </button>
+                    <?php endif; ?>
+                </form>
             </div>
         <?php endforeach; ?>
     </div>

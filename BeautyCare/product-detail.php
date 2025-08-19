@@ -36,6 +36,45 @@ if (!$result || $result->num_rows == 0) {
 $product = $result->fetch_assoc();
 $stmt->close();
 
+// --- Kiểm tra khuyến mãi cho sản phẩm --- 
+$currentDateTime = date('Y-m-d H:i:s');
+
+$sqlPromo = "SELECT km.*
+             FROM khuyen_mai km
+             JOIN san_pham_khuyen_mai spkm ON km.id = spkm.khuyen_mai_id
+             WHERE spkm.san_pham_id = ?
+               AND km.trang_thai = 1
+               AND km.ngay_bat_dau <= ?
+               AND km.ngay_ket_thuc >= ?
+             ORDER BY km.id DESC LIMIT 1";
+
+$stmtPromo = $conn->prepare($sqlPromo);
+$stmtPromo->bind_param("iss", $product_id, $currentDateTime, $currentDateTime);
+$stmtPromo->execute();
+$promoResult = $stmtPromo->get_result();
+$promo = $promoResult->fetch_assoc();
+$stmtPromo->close();
+
+$isPromoActive = false;
+$discountPrice = null;
+
+if ($promo) {
+    // Nếu là "giờ vàng cuối tuần" thì kiểm tra thêm ngày & giờ
+    if ((int)$promo['id'] === 1) {
+        $dayOfWeek = (int)date('N'); // 1=Thứ 2..7=CN
+        $hour      = (int)date('H');
+        if (in_array($dayOfWeek, [5,6,7], true) && $hour >= 19 && $hour <= 23) {
+            $isPromoActive = true;
+        }
+    } else {
+        $isPromoActive = true;
+    }
+
+    if ($isPromoActive) {
+        $discountPrice = $product['gia'] * (1 - $promo['muc_giam_gia'] / 100);
+    }
+}
+
 // Chuẩn bị và thực thi câu lệnh SQL để lấy 2 đánh giá gần nhất
 $sql_reviews = "SELECT dg.*, u.fullname 
                 FROM danh_gia dg
@@ -71,7 +110,16 @@ $stmt_count->close();
         </div>
         <div class="product-info">
             <h2><?php echo htmlspecialchars($product['ten_san_pham']); ?></h2>
-            <p class="price"><?php echo number_format($product['gia'], 0, ',', '.'); ?> VND</p>
+            <?php if ($isPromoActive && $discountPrice): ?>
+              <p class="original-price"><?php echo number_format($product['gia'], 0, ',', '.'); ?> VND</p>
+              <p class="promo-price">
+                <?php echo number_format($discountPrice, 0, ',', '.'); ?> VND
+                <span class="badge">-<?= $promo['muc_giam_gia']; ?>%</span>
+              </p>
+            <?php else: ?>
+              <p class="price"><?php echo number_format($product['gia'], 0, ',', '.'); ?> VND</p>
+            <?php endif; ?>
+
             <p><strong>Thương hiệu:</strong> <?php echo htmlspecialchars($product['thuong_hieu']); ?></p>
             <p><strong>Phân loại:</strong> <?php echo htmlspecialchars($product['phan_loai']); ?></p>
             <p><strong>Mô tả:</strong> <?php echo htmlspecialchars($product['mo_ta']); ?></p>

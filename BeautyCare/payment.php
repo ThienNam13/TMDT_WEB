@@ -26,28 +26,23 @@ $shippingFee = 15000; // 15,000 VND
 
 // Calculate total from cart items and get product details
 $cartDetails = [];
-if (!empty($cartItems)) {
-    foreach ($cartItems as $productId => $item) {
-        $quantity = $item['qty'] ?? 1;
-        
-        $stmt = $conn->prepare("SELECT id, ten_san_pham, gia, hinh_anh FROM san_pham WHERE id = ?");
-        $stmt->bind_param("i", $productId);
-        $stmt->execute();
-        $stmt->bind_result($id, $ten_san_pham, $gia, $hinh_anh);
-        if ($stmt->fetch()) {
-            $lineTotal = $gia * $quantity;
-            $total += $lineTotal;
-            $cartDetails[] = [
-                'id' => $id,
-                'ten_san_pham' => $ten_san_pham,
-                'gia' => $gia,
-                'hinh_anh' => $hinh_anh,
-                'qty' => $quantity,
-                'line_total' => $lineTotal
-            ];
-        }
-        $stmt->close();
-    }
+// Lấy giỏ từ session
+$cartItems = $_SESSION['cart'] ?? [];
+$total = 0;
+$shippingFee = 15000;
+$cartDetails = [];
+
+foreach ($cartItems as $item) {
+    $lineTotal = $item['gia'] * $item['qty'];
+    $total += $lineTotal;
+    $cartDetails[] = [
+        'id' => $item['id'],
+        'ten_san_pham' => $item['ten_san_pham'],
+        'gia' => $item['gia'], // đã là giá cuối cùng
+        'hinh_anh' => $item['hinh_anh'],
+        'qty' => $item['qty'],
+        'line_total' => $lineTotal
+    ];
 }
 
 $grandTotal = $total + $shippingFee;
