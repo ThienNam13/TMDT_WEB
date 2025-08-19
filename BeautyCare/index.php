@@ -49,62 +49,70 @@ $promoData = $conn->query($sqlPromo)->fetch_assoc();
 
 // --- Kiểm tra khuyến mãi ---
 $isPromoActive = false;
-$promoMessage = "";
-$promoProducts = [];
-$nextPromoTime = null;
+$promoMessage   = "";
+$promoProducts  = [];
+$nextPromoTime  = null;
 
 if ($promoData) {
-    $dayOfWeek = date('N'); // 1=Thứ 2, 7=CN
-    $hour = date('H');
-    
-    // Kiểm tra nếu là khuyến mãi giờ vàng cuối tuần
-    if ($promoData['id'] == 1) {
-        if (in_array($dayOfWeek, [6,7,8])) {
+    $dayOfWeek = (int)date('N'); // 1=Thứ 2 ... 7=CN
+    $hour      = (int)date('H');
+
+    if ((int)$promoData['id'] === 1) {
+        // Giờ vàng cuối tuần: T6–CN, 19:00–23:59
+        if (in_array($dayOfWeek, [5,6,7], true)) {
             $isPromoActive = ($hour >= 19 && $hour <= 23);
-            $promoMessage = $isPromoActive 
-                ? "🔥 Giờ vàng khuyến mãi! Giảm ngay {$promoData['muc_giam_gia']}%" 
+            $promoMessage  = $isPromoActive
+                ? "🔥 Giờ vàng khuyến mãi! Giảm ngay {$promoData['muc_giam_gia']}%"
                 : "Khuyến mãi giờ vàng sắp diễn ra!";
-            
-            // Tính thời gian đến khuyến mãi tiếp theo
+
+            // Không trong khung giờ: đếm tới lần bắt đầu gần nhất
             if (!$isPromoActive) {
-                if ($dayOfWeek < 5) {
-                    $nextPromoDay = 5; // Thứ 6
-                } elseif ($dayOfWeek == 5 && $hour < 19) {
-                    $nextPromoDay = 5; // Cùng ngày nhưng chưa đến giờ
+                // Nếu hôm nay là Thứ 6 và chưa tới 19:00 -> đếm tới 19:00 hôm nay
+                $today1900 = strtotime('today 19:00:00');
+                if ($dayOfWeek === 5 && time() < $today1900) {
+                    $nextPromoTime = $today1900;
                 } else {
-                    $nextPromoDay = 5 + (7 - $dayOfWeek); // Thứ 6 tuần sau
+                    // Ngược lại -> Thứ 6 kế tiếp 19:00
+                    $nextPromoTime = strtotime('next Friday 19:00:00');
                 }
-                $nextPromoTime = strtotime("next Friday 19:00:00");
             }
+        } else {
+            // Thứ 2–5: luôn đếm tới Thứ 6 19:00 gần nhất
+            $promoMessage = "Khuyến mãi giờ vàng sắp diễn ra!";
+            $fridayThisWeek = strtotime('friday this week 19:00:00');
+            $nextPromoTime  = (time() < $fridayThisWeek)
+                ? $fridayThisWeek
+                : strtotime('next Friday 19:00:00');
         }
     } else {
-        // Xử lý các loại khuyến mãi khác
+        // Các khuyến mãi khác: đang chạy suốt thời gian hiệu lực
         $isPromoActive = true;
-        $promoMessage = "🔥 {$promoData['ten_chuong_trinh']} - Giảm {$promoData['muc_giam_gia']}%";
+        $promoMessage  = "🔥 {$promoData['ten_chuong_trinh']} - Giảm {$promoData['muc_giam_gia']}%";
     }
-    
+
     // Lấy sản phẩm khuyến mãi
-    if ($isPromoActive || $promoData['id'] == 1) {
+    if ($isPromoActive || (int)$promoData['id'] === 1) {
         $sqlProducts = "SELECT sp.* FROM san_pham sp
                         JOIN san_pham_khuyen_mai spkm ON sp.id = spkm.san_pham_id
                         WHERE spkm.khuyen_mai_id = {$promoData['id']}
                         ORDER BY RAND() LIMIT 8";
-        
         $result = $conn->query($sqlProducts);
+
         if ($result && $result->num_rows > 0) {
-            while($row = $result->fetch_assoc()) {
+            while ($row = $result->fetch_assoc()) {
                 $promoProducts[] = $row;
             }
         } else {
-            // Nếu không có sản phẩm được chọn riêng, lấy ngẫu nhiên
+            // fallback
             $sqlRandom = "SELECT * FROM san_pham ORDER BY RAND() LIMIT 6";
             $resultRandom = $conn->query($sqlRandom);
-            while($row = $resultRandom->fetch_assoc()) {
+            while ($row = $resultRandom->fetch_assoc()) {
                 $promoProducts[] = $row;
             }
         }
     }
 }
+// --- HẾT: Kiểm tra khuyến mãi ---
 
 // Nếu không có khuyến mãi nào, kiểm tra khuyến mãi sắp tới
 if (!$promoData) {
