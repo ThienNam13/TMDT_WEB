@@ -133,7 +133,7 @@ if (!$promoData) {
     <div class="promo-products">
         <?php foreach($promoProducts as $sp): ?>
             <div class="promo-product-card">
-                <img src="uploads/<?php echo htmlspecialchars($sp['hinh_anh']); ?>" alt="<?php echo htmlspecialchars($sp['ten_san_pham']); ?>">
+                <img src="assets/img/products/<?php echo htmlspecialchars($sp['hinh_anh']); ?>" alt="<?php echo htmlspecialchars($sp['ten_san_pham']); ?>">
                 <h3><?php echo htmlspecialchars($sp['ten_san_pham']); ?></h3>
                 
                 <?php if ($isPromoActive): ?>

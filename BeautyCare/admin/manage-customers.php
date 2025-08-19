@@ -126,8 +126,8 @@ $stats = [
                                         <button class="action-btn view-btn" title="Xem chi tiết" data-id="<?= $customer['id'] ?>">
                                             <i class="fas fa-eye"></i>
                                         </button>
-                                        <button class="action-btn edit-btn" title="Sửa khách hàng" data-id="<?= $customer['id'] ?>">
-                                            <i class="fas fa-edit"></i>
+                                        <!-- <button class="action-btn edit-btn" title="Sửa khách hàng" data-id="<?= $customer['id'] ?>">
+                                            <i class="fas fa-edit"></i> -->
                                         </button>
                                         <button class="action-btn delete-btn" title="Xóa khách hàng" data-id="<?= $customer['id'] ?>">
                                             <i class="fas fa-trash"></i>
