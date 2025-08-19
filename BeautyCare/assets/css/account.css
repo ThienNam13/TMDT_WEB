@@ -1,6 +1,7 @@
 .account-container {
     display: flex;
-    max-width: 900px;
+    width: 100%;              /* chiếm toàn bộ chiều rộng cha */
+    max-width: 1200px;
     margin: 50px auto;
     background: #fff;
     border-radius: 10px;
