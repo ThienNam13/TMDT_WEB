@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot</title>
+</head>
+<body>
+
+<div class="chatbot-bubble" id="chatbot-bubble">
+    <img src="assets/img/icon.png" alt="Chatbot Icon">
+</div>
+
+<div class="chatbot-container" id="chatbot-container">
+    <div class="chatbot-header">
+        <span>Tư vấn mỹ phẩm AI ✨</span>
+        <span style="cursor: pointer;" onclick="toggleChat()">&#x2715;</span>
+    </div>
+    <div class="chat-messages" id="chat-messages">
+        <div class="message ai-message">Chào bạn, mình là trợ lý ảo AI chuyên về mỹ phẩm. Mình có thể giúp gì cho bạn hôm nay?</div>
+    </div>
+    <div class="chat-input">
+        <input type="text" id="user-input" placeholder="Nhập tin nhắn...">
+        <button onclick="sendMessage()">Gửi</button>
+    </div>
+</div>
+
+<style>
+    /* CSS cho Chatbot với màu Hồng Tím pastel */
+    .chatbot-bubble {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 60px;
+        height: 60px;
+        background-color: #e5b9d3;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: grab;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        z-index: 1000;
+        transition: transform 0.3s ease;
+    }
+    .chatbot-bubble:hover {
+        transform: scale(1.1);
+    }
+    .chatbot-bubble img {
+        width: 35px;
+        height: 35px;
+        filter: invert(1);
+    }
+    .chatbot-container {
+        position: fixed;
+        bottom: 90px;
+        right: 20px;
+        width: 350px;
+        height: 500px;
+        background: #fdf1f8;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        display: none;
+        flex-direction: column;
+        overflow: hidden;
+        z-index: 999;
+    }
+    .chatbot-header {
+        background-color: #e5b9d3;
+        color: white;
+        padding: 15px;
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-weight: bold;
+    }
+    .chat-messages {
+        flex: 1;
+        padding: 20px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    .message {
+        max-width: 80%;
+        padding: 10px;
+        border-radius: 15px;
+        line-height: 1.4;
+        word-wrap: break-word;
+    }
+    .user-message {
+        background-color: #f7e0ef;
+        align-self: flex-end;
+    }
+    .ai-message {
+        background-color: #ffffff;
+        align-self: flex-start;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    }
+    .chat-input {
+        display: flex;
+        padding: 10px;
+        background-color: #fff;
+        border-top: 1px solid #ddd;
+    }
+    .chat-input input {
+        flex: 1;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 20px;
+        outline: none;
+    }
+    .chat-input button {
+        background-color: #e5b9d3;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        margin-left: 10px;
+        border-radius: 20px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+    .chat-input button:hover {
+        background-color: #d195bb;
+    }
+    /* CSS cho thông báo chờ */
+    .ai-typing-indicator {
+        display: flex;
+        align-items: center;
+        padding: 10px;
+        gap: 5px;
+        background-color: #ffffff;
+        border-radius: 15px;
+        max-width: fit-content;
+    }
+    .ai-typing-indicator .dot {
+        width: 8px;
+        height: 8px;
+        background-color: #e5b9d3;
+        border-radius: 50%;
+        animation: bounce 1s infinite;
+    }
+    .ai-typing-indicator .dot:nth-child(2) {
+        animation-delay: 0.2s;
+    }
+    .ai-typing-indicator .dot:nth-child(3) {
+        animation-delay: 0.4s;
+    }
+    @keyframes bounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-5px); }
+    }
+</style>
+
+<script>
+    // JavaScript cho Chatbot
+    const chatbotBubble = document.getElementById('chatbot-bubble');
+    const chatbotContainer = document.getElementById('chatbot-container');
+    const chatMessages = document.getElementById('chat-messages');
+    const userInput = document.getElementById('user-input');
+
+    let isDragging = false;
+    let offsetX, offsetY;
+
+    // Kéo và thả bong bóng
+    chatbotBubble.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        const rect = chatbotBubble.getBoundingClientRect();
+        offsetX = e.clientX - rect.left;
+        offsetY = e.clientY - rect.top;
+        chatbotBubble.style.cursor = 'grabbing';
+        e.preventDefault();
+    });
+
+    document.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        const newX = e.clientX - offsetX;
+        const newY = e.clientY - offsetY;
+        chatbotBubble.style.right = 'auto';
+        chatbotBubble.style.bottom = 'auto';
+        chatbotBubble.style.left = `${newX}px`;
+        chatbotBubble.style.top = `${newY}px`;
+    });
+
+    document.addEventListener('mouseup', () => {
+        if (isDragging) {
+            isDragging = false;
+            chatbotBubble.style.cursor = 'grab';
+        }
+    });
+
+    function toggleChat() {
+        if (!isDragging) {
+            if (chatbotContainer.style.display === 'flex') {
+                chatbotContainer.style.display = 'none';
+            } else {
+                chatbotContainer.style.display = 'flex';
+                userInput.focus();
+            }
+        }
+    }
+
+    chatbotBubble.addEventListener('click', toggleChat);
+
+    function addMessage(text, isUser) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${isUser ? 'user-message' : 'ai-message'}`;
+        messageDiv.innerHTML = text;
+        chatMessages.appendChild(messageDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+    
+    // Hàm tạo và chèn chỉ báo gõ phím
+    function createTypingIndicator() {
+        const typingIndicator = document.createElement('div');
+        typingIndicator.className = 'ai-typing-indicator';
+        typingIndicator.id = 'typing-indicator';
+        typingIndicator.innerHTML = `
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+        `;
+        return typingIndicator;
+    }
+
+    function sendMessage() {
+        const message = userInput.value.trim();
+        if (message === '') return;
+
+        addMessage(message, true);
+        userInput.value = '';
+        
+        // Tạo và thêm thông báo chờ vào DOM
+        const typingIndicator = createTypingIndicator();
+        chatMessages.appendChild(typingIndicator);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+
+        const formData = new FormData();
+        formData.append('user_message', message);
+
+        fetch('chatbot.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Xóa thông báo chờ khi nhận được phản hồi
+            if (typingIndicator) {
+                typingIndicator.remove();
+            }
+
+            if (data.response) {
+                addMessage(data.response, false);
+            } else {
+                addMessage("Có lỗi xảy ra, vui lòng thử lại.", false);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            // Xóa thông báo chờ và hiển thị lỗi
+            if (typingIndicator) {
+                typingIndicator.remove();
+            }
+            addMessage("Không thể kết nối với hệ thống tư vấn. Vui lòng thử lại sau.", false);
+        });
+    }
+
+    userInput.addEventListener('keydown', function(event) {
+        if (event.key === 'Enter') {
+            sendMessage();
+        }
+    });
+</script>
