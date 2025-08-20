@@ -51,3 +51,11 @@ if (!isset($_SESSION['admin_id'])) {
         </ul>
     </div>
 </nav>
+
+<div class="notification">
+    <div class="icon-wrapper">
+        <i class="fas fa-bell"></i>
+        <span id="order-badge" class="badge" style="display:none;">0</span>
+    </div>
+    <span class="label">Có đơn hàng chờ xác nhận</span>
+</div>

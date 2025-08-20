@@ -244,9 +244,6 @@ while ($row = $statuses_result->fetch_assoc()) {
                 <button id="quick-search-btn"><i class="fas fa-search"></i></button>
             </div>
             <div class="action-buttons">
-                <!-- <a href="add_order.php" class="btn btn-primary">
-                    <i class="fas fa-plus"></i> Thêm đơn hàng
-                </a> -->
                 <a href="export-orders.php?<?= http_build_query($_GET) ?>" class="btn btn-primary">
                     <i class="fas fa-file-export"></i> Xuất Excel
                 </a>
@@ -292,8 +289,15 @@ while ($row = $statuses_result->fetch_assoc()) {
                                                 <a href="order_detail.php?id=<?= $row['id'] ?>" class="btn-icon" title="Xem chi tiết">
                                                     <i class="fas fa-eye"></i>
                                                 </a>
+                                                <?php if ($row['status'] === 'Chờ xác nhận'): ?>
+                                                    <button class="btn-icon btn-update-status" 
+                                                            data-id="<?= $row['id'] ?>" 
+                                                            data-action="confirm"
+                                                            title="Chuyển sang Đang xử lý">
+                                                        <i class="fas fa-check-circle"></i>
+                                                    </button>
 
-                                                <?php if ($row['status'] === 'Đang xử lý'): ?>
+                                                <?php elseif ($row['status'] === 'Đang xử lý'): ?>
                                                     <button class="btn-icon btn-update-status" 
                                                             data-id="<?= $row['id'] ?>" 
                                                             data-action="processing"
@@ -382,99 +386,107 @@ while ($row = $statuses_result->fetch_assoc()) {
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-    // Quick search functionality
-    document.getElementById('quick-search-btn').addEventListener('click', function() {
-        const searchValue = document.getElementById('quick-search').value;
-        const url = new URL(window.location.href);
-        url.searchParams.set('search', searchValue);
-        url.searchParams.delete('page'); // Reset to first page
-        window.location.href = url.toString();
-    });
+// ========================= QUICK SEARCH =========================
+document.getElementById('quick-search-btn').addEventListener('click', function() {
+    const searchValue = document.getElementById('quick-search').value;
+    const url = new URL(window.location.href);
+    url.searchParams.set('search', searchValue);
+    url.searchParams.delete('page'); // Reset về trang 1
+    window.location.href = url.toString();
+});
 
-    // Quick search on Enter key
-    document.getElementById('quick-search').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            document.getElementById('quick-search-btn').click();
-        }
-    });
+document.getElementById('quick-search').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        document.getElementById('quick-search-btn').click();
+    }
+});
 
-    // Delete confirmation
-    document.querySelectorAll('.btn-delete').forEach(btn => {
-        btn.addEventListener('click', function(e) {
-            if (!confirm('Bạn có chắc chắn muốn xóa đơn hàng này?')) {
-                e.preventDefault();
+// ========================= UPDATE STATUS =========================
+function attachUpdateStatusHandlers() {
+    document.querySelectorAll('.btn-update-status').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const orderId = this.dataset.id;
+            const actionType = this.dataset.action;
+            if (actionType === 'confirm') {
+                Swal.fire({
+                    title: 'Xác nhận',
+                    text: 'Bạn có chắc muốn chuyển đơn sang trạng thái "Đang xử lý"?',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'Xác nhận',
+                    cancelButtonText: 'Hủy'
+                }).then(result => {
+                    if (result.isConfirmed) {
+                        updateStatus(orderId, 'Đang xử lý');
+                    }
+                });
+            }
+
+
+            if (actionType === 'processing') {
+                Swal.fire({
+                    title: 'Xác nhận',
+                    text: 'Bạn có chắc muốn chuyển đơn sang trạng thái "Đang giao"?',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'Chuyển ngay',
+                    cancelButtonText: 'Hủy'
+                }).then(result => {
+                    if (result.isConfirmed) {
+                        updateStatus(orderId, 'Đang giao');
+                    }
+                });
+            }
+
+            if (actionType === 'complete') {
+                Swal.fire({
+                    title: 'Xác nhận',
+                    text: 'Bạn có chắc muốn chuyển đơn sang trạng thái "Hoàn tất"?',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'Xác nhận',
+                    cancelButtonText: 'Hủy'
+                }).then(result => {
+                    if (result.isConfirmed) {
+                        updateStatus(orderId, 'Hoàn tất');
+                    }
+                });
+            }
+
+            if (actionType === 'return') {
+                const reason = this.dataset.reason || 'Không có lý do';
+                Swal.fire({
+                    title: 'Yêu cầu trả hàng',
+                    html: `<p style="text-align:left;">${reason.replace(/\n/g,'<br>')}</p>`,
+                    icon: 'info',
+                    showCancelButton: true,
+                    showDenyButton: true,
+                    confirmButtonText: 'Xác nhận yêu cầu',
+                    denyButtonText: 'Từ chối yêu cầu',
+                    cancelButtonText: 'Đóng'
+                }).then(result => {
+                    if (result.isConfirmed) {
+                        updateStatus(orderId, 'Đã hủy');
+                    } else if (result.isDenied) {
+                        updateStatus(orderId, 'Đang giao');
+                    }
+                });
             }
         });
     });
-    // View reason
-document.querySelectorAll('.btn-update-status').forEach(btn => {
-    btn.addEventListener('click', function() {
-        const orderId = this.dataset.id;
-        const actionType = this.dataset.action;
 
-        if (actionType === 'processing') {
+    // Xem lý do hủy
+    document.querySelectorAll('.btn-view-reason').forEach(btn => {
+        btn.addEventListener('click', function() {
             Swal.fire({
-                title: 'Xác nhận',
-                text: 'Bạn có chắc muốn chuyển đơn hàng sang trạng thái "Đang giao"?',
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonText: 'Chuyển ngay',
-                cancelButtonText: 'Hủy'
-            }).then(result => {
-                if (result.isConfirmed) {
-                    updateStatus(orderId, 'Đang giao');
-                }
-            });
-        }
-
-        if (actionType === 'complete') {
-            Swal.fire({
-                title: 'Xác nhận',
-                text: 'Bạn có chắc muốn chuyển đơn hàng sang trạng thái "Hoàn tất"?',
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonText: 'Xác nhận',
-                cancelButtonText: 'Hủy'
-            }).then(result => {
-                if (result.isConfirmed) {
-                    updateStatus(orderId, 'Hoàn tất');
-                }
-            });
-        }
-
-        if (actionType === 'return') {
-            const reason = this.dataset.reason || 'Không có lý do';
-            Swal.fire({
-                title: 'Yêu cầu trả hàng',
-                html: `<p style="text-align:left;">${reason.replace(/\n/g,'<br>')}</p>`,
+                title: 'Lý do hủy đơn',
+                html: `<p style="text-align:left;color:#333;">${this.dataset.reason}</p>`,
                 icon: 'info',
-                showCancelButton: true,
-                showDenyButton: true,
-                confirmButtonText: 'Xác nhận yêu cầu',
-                denyButtonText: 'Từ chối yêu cầu',
-                cancelButtonText: 'Đóng'
-            }).then(result => {
-                if (result.isConfirmed) {
-                    updateStatus(orderId, 'Đã hủy');
-                } else if (result.isDenied) {
-                    updateStatus(orderId, 'Đang giao');
-                }
+                confirmButtonText: 'Đóng'
             });
-        }
-    });
-});
-
-// Xem lý do hủy
-document.querySelectorAll('.btn-view-reason').forEach(btn => {
-    btn.addEventListener('click', function() {
-        Swal.fire({
-            title: 'Lý do hủy đơn',
-            html: `<p style="text-align:left;color:#333;">${this.dataset.reason}</p>`,
-            icon: 'info',
-            confirmButtonText: 'Đóng'
         });
     });
-});
+}
 
 function updateStatus(orderId, newStatus, reason = '') {
     fetch('update_order_status.php', {
@@ -489,13 +501,49 @@ function updateStatus(orderId, newStatus, reason = '') {
     .then(data => {
         Swal.fire(data.status === 'success' ? 'Thành công' : 'Lỗi', data.message, data.status);
         if (data.status === 'success') {
-            setTimeout(() => location.reload(), 1000);
+            setTimeout(() => loadOrders(), 800);
         }
     })
     .catch(() => {
         Swal.fire('Lỗi', 'Không thể kết nối tới máy chủ', 'error');
     });
 }
+
+// ========================= AUTO LOAD ORDERS =========================
+function loadOrders() {
+    let query = window.location.search;
+    fetch('fetch_orders.php' + query)
+        .then(res => res.text())
+        .then(html => {
+            document.querySelector('.orders-table tbody').innerHTML = html;
+            attachUpdateStatusHandlers(); // gắn lại sự kiện cho các nút mới
+        })
+        .catch(err => console.error("Lỗi khi load orders:", err));
+}
+
+// ========================= CHECK NEW ORDERS =========================
+setInterval(() => {
+    fetch("check_new_orders.php")
+        .then(res => res.json())
+        .then(data => {
+            const badge = document.getElementById("order-badge");
+            if (data.count > 0) {
+                badge.textContent = data.count;
+                badge.style.display = "inline-block";
+                // refresh danh sách khi có đơn mới
+                loadOrders();
+            } else {
+                badge.style.display = "none";
+            }
+        })
+        .catch(err => console.error("Lỗi khi kiểm tra đơn mới:", err));
+}, 5000); // mỗi 5 giây kiểm tra
+
+// Khởi tạo lần đầu
+document.addEventListener('DOMContentLoaded', function() {
+    attachUpdateStatusHandlers();
+});
+
 
 // setInterval(() => {
 //     fetch('api_get_new_orders.php')
