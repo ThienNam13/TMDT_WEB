@@ -247,7 +247,7 @@ while ($row = $statuses_result->fetch_assoc()) {
                 <!-- <a href="add_order.php" class="btn btn-primary">
                     <i class="fas fa-plus"></i> Thêm đơn hàng
                 </a> -->
-                <a href="export-orders.php?<?= http_build_query($_GET) ?>" class="btn btn-secondary">
+                <a href="export-orders.php?<?= http_build_query($_GET) ?>" class="btn btn-primary">
                     <i class="fas fa-file-export"></i> Xuất Excel
                 </a>
             </div>
