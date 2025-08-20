@@ -1,7 +1,6 @@
 <?php
 include '../php/database.php';
 
-// Thiết lập header cho file Excel
 header('Content-Type: application/vnd.ms-excel');
 header('Content-Disposition: attachment; filename="bao_cao_doanh_thu_' . date('Y-m-d') . '.xls"');
 

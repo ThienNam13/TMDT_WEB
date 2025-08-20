@@ -2,7 +2,6 @@
 include '../php/database.php';
 include 'header.php';
 
-// Lấy ID sản phẩm từ URL
 $product_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 if ($product_id <= 0) {
     echo "<p style='color:red;'>ID sản phẩm không hợp lệ!</p>";

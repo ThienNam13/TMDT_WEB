@@ -3,7 +3,7 @@ include '../php/database.php';
 
 header('Content-Type: application/json');
 
-// Khởi tạo session nếu chưa có
+// Khởi tạo session
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }

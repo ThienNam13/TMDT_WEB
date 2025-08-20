@@ -1,9 +1,7 @@
 <?php
-// Kết nối CSDL
 include '../php/database.php';
 include 'header.php';
 
-// Hàm tính % tăng trưởng
 function calcGrowth($current, $previous) {
     if ($previous == 0) return $current > 0 ? 100 : 0;
     return round((($current - $previous) / $previous) * 100, 1);
@@ -338,15 +336,12 @@ while($row = $res->fetch_assoc()) {
     </section>
 </main>
 
-<!-- Thêm thư viện Chart.js và SheetJS -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script>
-// Biến lưu trữ các biểu đồ
 const charts = {};
 
-// Hàm chuyển đổi loại biểu đồ
 function toggleChartType(chartId) {
     const chart = charts[chartId];
     const newType = chart.config.type === 'bar' ? 'line' : 'bar';
@@ -354,7 +349,6 @@ function toggleChartType(chartId) {
     chart.update();
 }
 
-// Hàm xuất dữ liệu ra Excel
 function exportToExcel() {
     // Tạo workbook
     const wb = XLSX.utils.book_new();
@@ -500,7 +494,6 @@ charts.customerChart = new Chart(customerCtx, {
     }
 });
 
-// Khởi tạo date picker
 flatpickr(".date-picker", {
     mode: "range",
     dateFormat: "Y-m-d",
@@ -572,7 +565,6 @@ const chartOptions = {
     }
 };
 
-// Áp dụng cho tất cả biểu đồ
 charts.revenueChart.options = {...charts.revenueChart.options, ...chartOptions};
 charts.statusChart.options = {...charts.statusChart.options, ...chartOptions};
 charts.categoryChart.options = {...charts.categoryChart.options, ...chartOptions};
@@ -582,7 +574,6 @@ charts.customerChart.options = {...charts.customerChart.options, ...chartOptions
 </html>
 
 <?php 
-// Hàm lấy màu theo trạng thái
 function getStatusColor($status) {
     $colors = [
         'Đã đặt hàng' => '#FF6384',

@@ -1,5 +1,4 @@
 <?php
-// Kết nối CSDL
 include '../php/database.php';
 include 'header.php';
 
@@ -32,7 +31,6 @@ $reviewsResult = $conn->query($reviewsQuery);
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/css/dashboard.css">
     <style>
-        /* Thêm các style mới cho header nhỏ hơn */
         .small-header {
             padding: 10px 20px;
             background-color: #f8f9fa;

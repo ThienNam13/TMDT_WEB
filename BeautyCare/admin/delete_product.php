@@ -1,5 +1,4 @@
 <?php
-// Kết nối CSDL
 include '../php/database.php';
 
 // Kiểm tra có id không
@@ -9,7 +8,7 @@ if (!isset($_GET['id']) || empty($_GET['id'])) {
 
 $id = intval($_GET['id']);
 
-// Lấy thông tin sản phẩm trước khi xóa (để xóa cả ảnh nếu có)
+// Lấy thông tin sản phẩm trước khi xóa
 $sql_get = "SELECT hinh_anh FROM san_pham WHERE id = ?";
 $stmt_get = $conn->prepare($sql_get);
 $stmt_get->bind_param("i", $id);

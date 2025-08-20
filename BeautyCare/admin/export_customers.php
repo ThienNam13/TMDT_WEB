@@ -40,6 +40,5 @@ if ($result && $result->num_rows > 0) {
 
 echo '</table>';
 
-// Close database connection
 $conn->close();
 ?>

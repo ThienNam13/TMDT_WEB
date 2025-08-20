@@ -21,7 +21,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $address = trim($_POST['address'] ?? '');
     $blocked = isset($_POST['blocked']) ? 1 : 0;
 
-    // Validate
     $errors = [];
     if (empty($fullname)) $errors[] = "Vui lòng nhập họ tên";
     if (empty($email)) $errors[] = "Vui lòng nhập email";

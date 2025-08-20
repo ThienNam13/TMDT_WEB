@@ -23,7 +23,6 @@ if ($current->num_rows === 0) {
 }
 $current = $current->fetch_assoc();
 
-// Xử lý POST nhập/xuất kho
 $error = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $type = $_POST['type'];

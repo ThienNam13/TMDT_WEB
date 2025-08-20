@@ -1,5 +1,4 @@
 <?php
-// Kết nối CSDL
 include '../php/database.php';
 include 'header.php';
 
@@ -8,12 +7,10 @@ $page    = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
 $perPage = 10;
 $start   = ($page - 1) * $perPage;
 
-// Đếm tổng số khách hàng (đúng bảng: users)
 $totalRes = $conn->query("SELECT COUNT(*) AS total FROM users WHERE role='user'");
 $total    = (int)$totalRes->fetch_assoc()['total'];
 $pages    = (int)ceil($total / $perPage);
 
-// Lấy danh sách khách hàng (đổi customers -> users, đổi LIMIT dùng $start, $perPage)
 $query = "
     SELECT id, email, fullname, COALESCE(blocked, 0) AS blocked
     FROM users
@@ -23,12 +20,10 @@ $query = "
 ";
 $customers = $conn->query($query);
 
-// Thống kê khách hàng (không dùng created_at nữa)
 $stats = [
     'total'   => $total,
     'active'  => (int)$conn->query("SELECT COUNT(*) FROM users WHERE role='user' AND COALESCE(blocked,0)=0")->fetch_row()[0],
     'blocked' => (int)$conn->query("SELECT COUNT(*) FROM users WHERE role='user' AND COALESCE(blocked,0)=1")->fetch_row()[0],
-    // Không có cột created_at => tạm tính tất cả là mới (hoặc bạn để 0 nếu muốn)
     'new_this_month' => (int)$conn->query("SELECT COUNT(*) FROM users WHERE role='user'")->fetch_row()[0]
 ];
 ?>
@@ -56,7 +51,7 @@ $stats = [
             </div>
         </div>
 <!-- Thêm thông báo AJAX -->
-<div id="ajaxMessage" style="display:none;"></div> <!-- để thêm khách hàng không chuyển hướng -->
+<div id="ajaxMessage" style="display:none;"></div>
 
         <!-- Thống kê nhanh -->
         <div class="stats-grid">

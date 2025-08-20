@@ -1,5 +1,4 @@
 <?php
-// Kết nối CSDL và kiểm tra quyền admin
 include '../php/database.php';
 include 'header.php';
 
@@ -98,7 +97,7 @@ $promotions = $conn->query("SELECT * FROM khuyen_mai ORDER BY ngay_bat_dau DESC"
 // Lấy danh sách sản phẩm cho select box
 $products = $conn->query("SELECT id, ten_san_pham FROM san_pham WHERE is_available = 1 ORDER BY ten_san_pham");
 
-// Lấy khuyến mãi đang chỉnh sửa (nếu có)
+// Lấy khuyến mãi đang chỉnh sửa
 $edit_promo = null;
 if(isset($_GET['edit'])) {
     $edit_id = intval($_GET['edit']);

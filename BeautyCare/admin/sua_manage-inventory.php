@@ -28,7 +28,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $vi_tri_kho = trim($_POST['vi_tri_kho']);
     $so_luong_ton = (int)$_POST['so_luong_ton'];
     
-    // Validate input
     if (empty($vi_tri_kho)) {
         $error = "Vị trí kho không được để trống";
     } elseif ($so_luong_ton < 0) {
@@ -36,7 +35,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         $stmt = $conn->prepare("UPDATE kho_hang SET vi_tri_kho = ?, so_luong_ton = ? WHERE id = ?");
         $stmt->bind_param("sii", $vi_tri_kho, $so_luong_ton, $id);
-        // sau khi insert/update kho
         if ($so_luong_ton <= 0) {
             $conn->query("UPDATE san_pham SET is_available = 0 WHERE id = $san_pham_id");
         } else {
@@ -63,7 +61,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="stylesheet" href="assets/css/inventory.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        /* Thêm CSS tùy chỉnh */
         .edit-form-container {
             max-width: 600px;
             margin: 20px auto;

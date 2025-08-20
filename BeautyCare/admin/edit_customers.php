@@ -2,7 +2,6 @@
 include '../php/database.php';
 include 'header.php';
 
-// Lấy ID khách hàng từ URL
 $customerId = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
 // Lấy thông tin khách hàng từ database
@@ -128,7 +127,6 @@ if (!$customer) {
         </div>
     </section>
 </main>
-<!-- Thêm thư viện jQuery (nếu chưa có) -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
@@ -170,7 +168,6 @@ $(document).ready(function() {
         });
     });
 
-    // Sửa nút hủy để chắc chắn chuyển hướng
     $('.btn-cancel').on('click', function(e) {
         e.preventDefault();
         window.location.href = 'manage-customers.php';

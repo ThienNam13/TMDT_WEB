@@ -8,7 +8,6 @@ async function addProduct(productData) {
         }
     }
     
-    // Thêm file ảnh nếu có
     if (productData.hinh_anh) {
         formData.append('hinh_anh', productData.hinh_anh);
     }

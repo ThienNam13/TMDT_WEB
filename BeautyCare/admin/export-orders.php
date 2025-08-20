@@ -1,5 +1,4 @@
 <?php
-// BẮT BUỘC: không echo gì trước phần PHP này
 session_start();
 if (!isset($_SESSION['admin_id'])) {
     header("Location: login.php");
@@ -8,13 +7,11 @@ if (!isset($_SESSION['admin_id'])) {
 
 require_once '../php/database.php';
 
-// Nhận bộ lọc giống trang manage-orders.php
 $search    = isset($_GET['search']) ? trim($_GET['search']) : '';
 $status    = isset($_GET['status']) ? $_GET['status'] : '';
 $date_from = isset($_GET['date_from']) ? $_GET['date_from'] : '';
 $date_to   = isset($_GET['date_to']) ? $_GET['date_to'] : '';
 
-// Xây dựng query (không LIMIT để xuất hết)
 $sql = "SELECT
             o.id,
             o.ma_don,
@@ -54,13 +51,11 @@ if (!$result) {
     die("Lỗi truy vấn: " . $conn->error);
 }
 
-// Gửi header tải Excel (KHÔNG được có output nào trước đó)
 header('Content-Type: application/vnd.ms-excel; charset=UTF-8');
 header('Content-Disposition: attachment; filename="danh_sach_don_hang_' . date('Y-m-d') . '.xls"');
 header('Pragma: no-cache');
 header('Expires: 0');
 
-// BOM để Excel đọc đúng UTF-8
 echo "\xEF\xBB\xBF";
 
 echo "<table border='1'>";

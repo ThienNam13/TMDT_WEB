@@ -2,10 +2,8 @@
 include '../php/database.php';
 header('Content-Type: application/json');
 
-// Nhận ID theo cả 2 cách POST và GET để linh hoạt
 $customerId = $_POST['id'] ?? $_GET['id'] ?? 0;
 
-// Kiểm tra kết nối database
 if (!$conn) {
     echo json_encode(['success' => false, 'message' => 'Lỗi kết nối database']);
     exit;
