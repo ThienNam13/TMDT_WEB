@@ -7,7 +7,7 @@ if (isset($_GET['delete_id'])) {
     $delete_id = intval($_GET['delete_id']);
     $conn->query("DELETE FROM danh_gia WHERE id = $delete_id");
     $_SESSION['message'] = "Đã xóa phản hồi thành công!";
-    header("Location: review-management.php");
+    header("Location: " . $_SERVER['HTTP_REFERER']);
     exit();
 }
 
@@ -17,8 +17,27 @@ $reviewsQuery = "
     FROM danh_gia d
     JOIN users u ON d.user_id = u.id
     JOIN san_pham s ON d.san_pham_id = s.id
-    ORDER BY d.ngay_danh_gia DESC
+    WHERE 1=1
 ";
+
+// lọc theo số sao
+if (!empty($_GET['rating'])) {
+    $rating = (int)$_GET['rating'];
+    $reviewsQuery .= " AND d.so_sao = $rating";
+}
+
+// tìm kiếm theo tên / email / sản phẩm / bình luận
+if (!empty($_GET['search'])) {
+    $search = $conn->real_escape_string($_GET['search']);
+    $reviewsQuery .= " AND (
+        u.fullname LIKE '%$search%' OR 
+        u.email LIKE '%$search%' OR 
+        s.ten_san_pham LIKE '%$search%' OR
+        d.binh_luan LIKE '%$search%'
+    )";
+}
+
+$reviewsQuery .= " ORDER BY d.ngay_danh_gia DESC";
 $reviewsResult = $conn->query($reviewsQuery);
 ?>
 <!DOCTYPE html>
@@ -265,6 +284,11 @@ $reviewsResult = $conn->query($reviewsQuery);
 </main>
 
 <script>
+function confirmDelete(id) {
+    if (confirm("Bạn có chắc chắn muốn xóa đánh giá này?")) {
+        window.location.href = "review-management.php?delete_id=" + id;
+    }
+}
 // lọc đánh giá
 document.getElementById('apply-rating').addEventListener('click', function() {
     const rating = document.getElementById('rating_filter').value;
