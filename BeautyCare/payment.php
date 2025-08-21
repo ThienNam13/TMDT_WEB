@@ -1,7 +1,6 @@
 <?php
 session_start();
 
-// Kiểm tra đăng nhập trước khi xuất bất kỳ nội dung nào
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit;

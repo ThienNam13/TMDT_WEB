@@ -172,8 +172,23 @@ $stmt_count->close();
                 echo ' - ' . str_repeat('⭐', intval($rev['so_sao']));
                 echo '<br>' . nl2br(htmlspecialchars($rev['binh_luan']));
                 echo '<br><small>' . $rev['ngay_danh_gia'] . '</small>';
+                // Nếu có ảnh thì hiển thị
+                if (!empty($rev['anh_minh_chung'])) {
+                $images = explode(',', $rev['anh_minh_chung']);
+                echo '<div class="review-images" style="margin-top:8px;">';
+                foreach ($images as $img) {
+                  $img = trim($img);
+                  if ($img !== '') {
+                    echo '<img src="' . htmlspecialchars($img) . '" 
+                           alt="Ảnh đánh giá" 
+                           style="width:80px;height:80px;object-fit:cover;border-radius:6px;margin-right:5px;">';
+                  }
+                }
                 echo '</div>';
             }
+            echo '<br><small>' . $rev['ngay_danh_gia'] . '</small>';
+            echo '</div>';
+          }
         } else {
             echo "<p>Chưa có đánh giá nào cho sản phẩm này.</p>";
         }

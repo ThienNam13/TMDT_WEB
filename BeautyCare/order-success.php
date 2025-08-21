@@ -1,13 +1,23 @@
 <?php
-include 'includes/header.php';
-include 'includes/navbar.php';
-include 'php/database.php';
-date_default_timezone_set('Asia/Ho_Chi_Minh');
+session_start();
+
+$order = null;
 // Kiểm tra đăng nhập
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit;
 }
+// Nếu không tìm thấy đơn hàng
+if (!$order) {
+    http_response_code(403); // Forbidden
+    echo "<p style='color:red;text-align:center;'>Bạn không có quyền xem đơn hàng này.</p>";
+    exit;
+}
+include 'includes/header.php';
+include 'includes/navbar.php';
+include 'php/database.php';
+date_default_timezone_set('Asia/Ho_Chi_Minh');
+
 $userId = (int) $_SESSION['user_id'];
 
 // Determine which order to show

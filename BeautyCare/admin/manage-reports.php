@@ -255,7 +255,7 @@ while($row = $res->fetch_assoc()) {
                     <tbody>
                         <?php foreach($topProducts as $product): ?>
                         <tr>
-                            <td><img src="../<?= htmlspecialchars($product['hinh_anh']) ?>" alt="<?= htmlspecialchars($product['ten_san_pham']) ?>" class="product-thumbnail"></td>
+                            <td><img src="../assets/img/products/<?= htmlspecialchars($product['hinh_anh']) ?>" alt="<?= htmlspecialchars($product['ten_san_pham']) ?>" class="product-thumbnail"></td>
                             <td><?= htmlspecialchars($product['ten_san_pham']) ?></td>
                             <td><?= $product['total_sold'] ?></td>
                             <td><?= number_format($product['total_revenue'], 0, ',', '.') ?> ₫</td>
