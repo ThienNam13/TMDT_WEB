@@ -7,12 +7,7 @@ if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit;
 }
-// Nếu không tìm thấy đơn hàng
-if (!$order) {
-    http_response_code(403); // Forbidden
-    echo "<p style='color:red;text-align:center;'>Bạn không có quyền xem đơn hàng này.</p>";
-    exit;
-}
+
 include 'includes/header.php';
 include 'includes/navbar.php';
 include 'php/database.php';
@@ -115,6 +110,13 @@ if ($orderId) {
         }
         $stmt->close();
     }
+}
+
+// Nếu không tìm thấy đơn hàng
+if (!$order) {
+    http_response_code(403); // Forbidden
+    echo "<p style='color:red;text-align:center;'>Bạn không có quyền xem đơn hàng này.</p>";
+    exit;
 }
 
 // Calculate shipping fee (same as in payment.php)
