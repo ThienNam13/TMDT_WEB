@@ -54,16 +54,17 @@ $promoProducts  = [];
 $nextPromoTime  = null;
 
 if ($promoData) {
-    $dayOfWeek = (int)date('N'); // 1=Thứ 2 ... 7=CN
+    $dayOfWeek = (int)date('N');
     $hour      = (int)date('H');
-
     if ((int)$promoData['id'] === 1) {
-        // Giờ vàng cuối tuần: T6–CN, 19:00–23:59
+        // Giờ vàng cuối tuần
         if (in_array($dayOfWeek, [5,6,7], true)) {
+            // $isPromoActive = true; // ⚡ Bỏ qua điều kiện giờ để test
+            // $promoMessage  = "🔥 [TEST] Khuyến mãi luôn bật - Giảm {$promoData['muc_giam_gia']}%";
             $isPromoActive = ($hour >= 19 && $hour <= 23);
             $promoMessage  = $isPromoActive
-                ? "🔥 Giờ vàng khuyến mãi! Giảm ngay {$promoData['muc_giam_gia']}%"
-                : "Khuyến mãi giờ vàng sắp diễn ra!";
+                ? "🔥 3 Giờ vàng khuyến mãi! Giảm ngay {$promoData['muc_giam_gia']}%"
+                : "Flash Sale 3 giờ vàng sắp diễn ra!";
 
             // Không trong khung giờ: đếm tới lần bắt đầu gần nhất
             if (!$isPromoActive) {

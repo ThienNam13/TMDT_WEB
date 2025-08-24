@@ -117,13 +117,23 @@ foreach ($items as $it) {
         exit;
     }
 
-    $price = (float)$prod['gia'];
-    $total += $price * $qty;
+    // Lấy giá từ session cart (nếu có)
+    $finalPrice = null;
+    if (isset($_SESSION['cart'][$pid])) {
+        $finalPrice = (float)$_SESSION['cart'][$pid]['gia'];
+    }
+
+    // Nếu không có thì fallback về giá gốc từ DB
+    if (!$finalPrice || $finalPrice <= 0) {
+        $finalPrice = (float)$prod['gia'];
+    }
+
+    $total += $finalPrice * $qty;
 
     $detailedItems[] = [
         'san_pham_id' => (int)$prod['id'],
         'so_luong'    => $qty,
-        'don_gia'     => $price,
+        'don_gia'     => $finalPrice,
     ];
 }
 

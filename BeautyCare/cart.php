@@ -1,8 +1,6 @@
 <?php
 session_start();
 include 'php/database.php';
-include 'includes/header.php';
-include 'includes/navbar.php';
 
 if (!isset($_SESSION['cart'])) {
     $_SESSION['cart'] = [];
@@ -42,6 +40,7 @@ if (isset($_POST['update_qty'])) {
     $product_id = intval($_POST['product_id']);
     $new_qty = max(1, intval($_POST['quantity']));
     $so_luong_ton = $so_luong_ton ?? 0;
+    $ten_san_pham = $_SESSION['cart'][$product_id]['ten_san_pham'] ?? 'Sản phẩm';
     // Lấy số lượng tồn kho từ DB
     $sql = "SELECT so_luong_ton FROM kho_hang WHERE san_pham_id = ?";
     $stmt = $conn->prepare($sql);
@@ -53,12 +52,15 @@ if (isset($_POST['update_qty'])) {
 
     if (isset($_SESSION['cart'][$product_id])) {
         if ($new_qty > $so_luong_ton) {
-            $_SESSION['cart'][$product_id]['qty'] = $so_luong_ton; // Giới hạn lại
-            $ten_san_pham = $_SESSION['cart'][$product_id]['ten_san_pham'] ?? 'Sản phẩm';
-            $notice = "Sản phẩm {$ten_san_pham} chỉ còn {$so_luong_ton} cái trong kho, số lượng đã được điều chỉnh.";
+            $_SESSION['cart'][$product_id]['qty'] = $so_luong_ton;
+            $_SESSION['cart_notice'] = "Sản phẩm {$ten_san_pham} chỉ còn {$so_luong_ton} cái trong kho, số lượng đã được điều chỉnh.";
         } else {
             $_SESSION['cart'][$product_id]['qty'] = $new_qty;
+            $_SESSION['cart_notice'] = "Đã cập nhật số lượng sản phẩm!";
         }
+
+        header("Location: cart.php");
+        exit;
     }
 }
 
@@ -68,7 +70,8 @@ if (isset($_GET['remove'])) {
     unset($_SESSION['cart'][$remove_id]);
 }
 ?>
-
+<?php include 'includes/header.php'; ?>
+<?php include 'includes/navbar.php'; ?>
 <div class="container" style="margin-top: 20px;">
     <h2 class="section-title">Giỏ hàng của bạn</h2>
     <?php if (!empty($_SESSION['cart'])): ?>
@@ -140,7 +143,9 @@ if (isset($_GET['remove'])) {
             </td>
             <td><?php echo number_format($thanh_tien, 0, ',', '.'); ?> VND</td>
             <td>
-                <a href="cart.php?remove=<?php echo $item['id']; ?>" onclick="return confirm('Xóa sản phẩm này?')" class="btn-primary" style="background:#ffafcc;">Xóa</a>
+                <a href="cart.php?remove=<?php echo $item['id']; ?>" 
+                    onclick="return confirmDelete(event, <?php echo $item['id']; ?>)" 
+                    class="btn-primary" style="background:#ffafcc;">Xóa</a>
             </td>
         </tr>
         <?php endforeach; ?>
@@ -172,8 +177,19 @@ if (isset($_GET['remove'])) {
         <!-- Bảng giỏ hàng -->
     <?php endif; ?>
 </div>
-
+<?php if (isset($_SESSION['cart_notice'])): ?>
+<script>
+Swal.fire({
+    icon: 'info',
+    title: 'Thông báo',
+    text: '<?php echo $_SESSION['cart_notice']; ?>',
+    timer: 2500,
+    showConfirmButton: false
+});
+</script>
+<?php unset($_SESSION['cart_notice']); endif; ?>
 <?php include 'includes/footer.php'; ?>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 document.querySelectorAll('input[name="quantity"]').forEach(input => {
     function checkQuantity() {
@@ -206,4 +222,23 @@ document.querySelectorAll('input[name="quantity"]').forEach(input => {
     // Khi bấm phím lên/xuống
     input.addEventListener('keyup', checkQuantity);
 });
+
+function confirmDelete(e, id) {
+    e.preventDefault();
+    Swal.fire({
+        title: 'Bạn có chắc?',
+        text: "Sản phẩm sẽ bị xóa khỏi giỏ hàng!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Xóa',
+        cancelButtonText: 'Hủy'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            window.location.href = "cart.php?remove=" + id;
+        }
+    });
+    return false;
+}
 </script>

@@ -46,7 +46,7 @@ include 'includes/navbar.php';
                     </li>
                     <li>
                         <strong>Các tỉnh/thành phố khác:</strong> 
-                        <span class="highlight-text">3-5 ngày làm việc</span>
+                        <span class="highlight-text"> *Chưa hỗ trợ*</span>
                     </li>
                     <li class="note-item">
                         <i class="fas fa-info-circle"></i> Lưu ý: Thời gian giao hàng có thể thay đổi tùy thuộc vào thời điểm đặt hàng, các ngày lễ, Tết hoặc điều kiện thời tiết.
@@ -75,11 +75,7 @@ include 'includes/navbar.php';
 </div>
 
 <style>
-.shipping-container {
-    max-width: 900px;
-    margin: 30px auto;
-    padding: 0 20px;
-}
+
 
 .shipping-header {
     text-align: center;

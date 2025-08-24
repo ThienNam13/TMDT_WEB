@@ -48,6 +48,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <label>Mật khẩu</label>
             <input type="password" name="password" required>
             <button type="submit">Đăng nhập</button>
+
+             <!-- Nút quên mật khẩu -->
+            <div style="margin-top: 10px; text-align: right;">
+                <a href="../forgot_password.php" style="color: #b5838d; text-decoration: none;">
+                    Quên mật khẩu?
+                </a>
+            </div>
         </form>
     </div>
 </body>

@@ -18,8 +18,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($errors)) {
         try {
             $stmt = $conn->prepare("INSERT INTO lien_he (user_id, ho_ten, email, noi_dung, ngay_gui) 
-                                   VALUES (?, ?, ?, ?, NOW())");
-            $stmt->execute([$userId, $name, $email, $message]);
+                                    VALUES (?, ?, ?, ?, NOW())");
+
+            $stmt->bind_param("isss", $userId, $name, $email, $message);
+
+            if ($stmt->execute()) {
+                $_SESSION['form_submitted'] = true;
+                header('Location: contact.php?success=1');
+                exit();
+            } else {
+                error_log('Lỗi khi xử lý form liên hệ: ' . $stmt->error);
+                $_SESSION['form_errors'] = ['Đã có lỗi xảy ra, vui lòng thử lại sau'];
+                header('Location: contact.php');
+                exit();
+            }
             
             $_SESSION['form_submitted'] = true;
             header('Location: contact.php?success=1');

@@ -3,7 +3,7 @@ session_start();
 $pageTitle = "Liên hệ";
 include 'includes/header.php';
 include 'includes/navbar.php';
-include 'php\database.php'; // Thêm kết nối database
+include 'php\database.php';
 
 // Xử lý khi form được submit
 $showSuccess = false;
@@ -19,7 +19,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                VALUES (?, ?, ?, ?, NOW())");
         $stmt->execute([$userId, $name, $email, $message]);
         
-        // Gửi email thông báo (code giả lập)
         // mail('support@beautycare.com', 'Liên hệ mới từ ' . $name, $message, 'From: ' . $email);
         
         $showSuccess = true;
@@ -30,7 +29,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 ?>
 
-<!-- Phần HTML giữ nguyên như file gốc -->
 <?php if ($showSuccess || (isset($_SESSION['form_submitted']) && $_SESSION['form_submitted'])): ?>
 <div class="success-message">
     <div class="success-content">

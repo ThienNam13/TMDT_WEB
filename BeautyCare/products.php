@@ -5,11 +5,14 @@ include 'includes/navbar.php';
 
 // Lấy category từ GET
 $category = isset($_GET['category']) ? $conn->real_escape_string($_GET['category']) : null;
-$brands = isset($_GET['brand']) && is_array($_GET['brand']) ? $_GET['brand'] : [];
+$brands = [];
+if (isset($_GET['brand'])) {
+    $brands = is_array($_GET['brand']) ? $_GET['brand'] : [$_GET['brand']];
+}
 // Định nghĩa biến tìm kiếm từ URL
 $search_term = isset($_GET['search']) ? $conn->real_escape_string($_GET['search']) : null;
-$price_min = isset($_GET['price_min']) ? (int)$_GET['price_min'] : null;
-$price_max = isset($_GET['price_max']) ? (int)$_GET['price_max'] : null;
+$price_min = (isset($_GET['price_min']) && $_GET['price_min'] !== '') ? (int)$_GET['price_min'] : null;
+$price_max = (isset($_GET['price_max']) && $_GET['price_max'] !== '') ? (int)$_GET['price_max'] : null;
 
 // Lấy mã danh mục từ tên danh mục
 $ma_danh_muc = null;
@@ -53,15 +56,17 @@ if (!empty($brands)) {
 }
 
 // --- Lọc giá ---
-if ($price_min !== null) {
+if (isset($_GET['price_min']) && $_GET['price_min'] !== '') {
+    $price_min = (int)$_GET['price_min'];
     $sql .= " AND gia >= $price_min";
 }
-if ($price_max !== null) {
+if (isset($_GET['price_max']) && $_GET['price_max'] !== '') {
+    $price_max = (int)$_GET['price_max'];
     $sql .= " AND gia <= $price_max";
 }
 $result = $conn->query($sql);
+// echo "<pre>$sql</pre>";
 ?>
-
 <style>
 /* Layout chung */
 .products-page {
@@ -187,7 +192,7 @@ $result = $conn->query($sql);
                 <?php
                 foreach ($brands_list as $brand) {
                     $checked = in_array($brand, $brands) ? 'checked' : '';
-                    echo '<label><input type="checkbox" name="brand[]" value="'.htmlspecialchars($brand).'" '.$checked.'> '.htmlspecialchars($brand).'</label>';
+                    echo '<label><input type="checkbox" name="brand[]" value="'.$brand.'" '.$checked.'> '.htmlspecialchars($brand).'</label>';
                 }
                 ?>
             </div>
@@ -195,10 +200,10 @@ $result = $conn->query($sql);
             <h3>Khoảng giá</h3>
             <div class="price-filter" style="margin-bottom: 15px;">
                 <input type="number" name="price_min" placeholder="Từ" 
-                        value="<?php echo htmlspecialchars($price_min); ?>" 
+                        value="<?php echo ($price_min !== null ? htmlspecialchars($price_min) : ''); ?>"
                         style="width: 45%; padding: 5px; margin-right:5%; border:1px solid #ddd; border-radius:4px;">
                 <input type="number" name="price_max" placeholder="Đến" 
-                        value="<?php echo htmlspecialchars($price_max); ?>" 
+                        value="<?php echo ($price_max !== null ? htmlspecialchars($price_max) : ''); ?>"
                         style="width: 45%; padding: 5px; border:1px solid #ddd; border-radius:4px;">
             </div>
 
